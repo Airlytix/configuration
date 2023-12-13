@@ -1,0 +1,40 @@
+substitutions:
+  name: "airlytix"
+  friendly_name: "Airlytix"
+  project_name: "airlytix.es1"
+  project_version: "1.0.0"
+  hidden_ssid: "false"
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: true
+  project:
+    name: ${project_name}
+    version: ${project_version}
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+logger:
+
+api:
+
+ota:
+
+dashboard_import:
+  package_import_url: github://airlytix/configuration/airlytix-es1-rev1.0.yaml@main
+  import_full_config: false
+
+wifi:
+  ap:
+    password: "tbJWe4T7rD"
+
+captive_portal:
+
+esp32_improv:
+  authorizer: none
+
+improv_serial:
