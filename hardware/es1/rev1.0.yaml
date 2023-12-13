@@ -1,0 +1,8 @@
+output:
+  - platform: gpio
+    id: status_led_2
+    pin: GPIO13
+
+
+status_led:
+  pin: GPIO32

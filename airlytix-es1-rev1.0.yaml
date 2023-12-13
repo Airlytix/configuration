@@ -3,7 +3,6 @@ substitutions:
   friendly_name: "Airlytix"
   project_name: "airlytix.es1"
   project_version: "1.0.0"
-  hidden_ssid: "false"
 
 esphome:
   name: ${name}
@@ -38,3 +37,28 @@ esp32_improv:
   authorizer: none
 
 improv_serial:
+
+<<: !include hardware/es1/rev1.0.yaml
+
+interval:
+  - interval: 1s
+    then:
+      if:
+        condition:
+          wifi.connected:
+        then:
+          - if:
+              condition:
+                api.connected:
+              then:
+                - output.turn_off: status_led_2
+              else:
+                - output.turn_on: status_led_2
+                - delay: 500ms
+                - output.turn_off: status_led_2
+                - delay: 500ms
+        else:
+          - output.turn_on: status_led_2
+          - delay: 200ms
+          - output.turn_off: status_led_2
+          - delay: 200ms
