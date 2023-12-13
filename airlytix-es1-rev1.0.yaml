@@ -2,8 +2,10 @@ substitutions:
   name: "airlytix"
   friendly_name: "Airlytix"
   project_name: "airlytix.es1"
-  project_version: "0.0.2"
+  project_version: "0.0.3"
   indicator_max_power: "0.1"
+  sht4x_temperature_offset: "0"
+  sht4x_humidity_offset: "0"
 
 esphome:
   name: ${name}
@@ -44,6 +46,7 @@ improv_serial:
 packages:
   indicator_led: !include components/indicator_led.yaml
   diagnostics: !include components/diagnostics.yaml
+  temp_sensor: !include components/sensors.yaml
 
 interval:
   - interval: 1s
