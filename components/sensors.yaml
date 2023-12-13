@@ -26,17 +26,17 @@ sensor:
       name: "Temperature"
       filters: 
         - offset: ${sht4x_temperature_offset}
-      #on_value: 
-      #  then:
-      #    - component.update: internal_temperature_state
+      on_value: 
+        then:
+          - component.update: internal_temperature_state
     humidity:
       id: sht4x_humidity
       name: "Humidity"
       filters: 
         - offset: ${sht4x_humidity_offset}
-      #on_value: 
-      #  then:
-      #    - component.update: internal_humidity_state
+      on_value: 
+        then:
+          - component.update: internal_humidity_state
     update_interval: 60s
 
 
@@ -57,30 +57,30 @@ sensor:
       name: "PM <1µm Weight concentration"
       id: "sen55_pm_1_0"
       accuracy_decimals: 1
-      #on_value: 
-      #  then:
-      #    - component.update: internal_pm_1_0_state
+      on_value: 
+        then:
+          - component.update: internal_pm_1_0_state
     pm_2_5:
       name: "PM <2.5µm Weight concentration"
       id: "sen55_pm_2_5"
       accuracy_decimals: 1
-      #on_value: 
-      #  then:
-      #    - component.update: internal_pm_2_5_state
+      on_value: 
+        then:
+          - component.update: internal_pm_2_5_state
     pm_4_0:
       name: "PM <4µm Weight concentration"
       id: "sen55_pm_4_0"
       accuracy_decimals: 1
-      #on_value: 
-      #  then:
-      #    - component.update: internal_pm_4_0_state
+      on_value: 
+        then:
+          - component.update: internal_pm_4_0_state
     pm_10_0:
       name: "PM <10µm Weight concentration"
       id: "sen55_pm_10_0"
       accuracy_decimals: 1
-      #on_value: 
-      #  then:
-      #    - component.update: internal_pm_10_0_state
+      on_value: 
+        then:
+          - component.update: internal_pm_10_0_state
     temperature:
       disabled_by_default: true
       internal: true

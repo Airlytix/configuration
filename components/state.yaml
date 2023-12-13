@@ -1,0 +1,428 @@
+text_sensor:
+  - platform: template
+    id: "state"
+    name: "State"
+    lambda: |-
+      auto maxState = std::max({id(internal_temperature_state).state, id(internal_humidity_state).state, id(internal_pm_1_0_state).state, id(internal_pm_2_5_state).state, id(internal_pm_4_0_state).state, id(internal_pm_10_0_state).state});
+      if (maxState == 0) {
+        return {"good"};
+      } else if (maxState == 1) {
+        return {"fair"};
+      } else {
+        return {"poor"};
+      }
+    update_interval: never
+    on_value: 
+      then:
+        - if: 
+            condition: 
+              - lambda: return x == "good";
+            then:
+              - light.control: 
+                  id: indicator_light_internal
+                  blue: 0
+                  green: 1
+                  red: 0
+                  effect: "None"
+            else:
+              if:
+                condition:                  
+                  - lambda: return x == "fair";
+                then:
+                  - light.control: 
+                      id: indicator_light_internal
+                      blue: 0
+                      green: 0.647
+                      red: 1
+                      effect: "None"
+                else:
+                  - light.control: 
+                      id: indicator_light_internal
+                      blue: 0
+                      green: 0
+                      red: 1
+                      effect: "None"
+
+  - platform: template
+    id: "temperature_state"
+    name: "Temperature State"
+    lambda: |-
+      if (id(internal_temperature_state).state == 0) {
+        return {"good"};
+      } else if (id(internal_temperature_state).state == 1) {
+        return {"fair"};
+      } else {
+        return {"poor"};
+      }
+  - platform: template
+    id: "humidity_state"
+    name: "Humidity State"
+    lambda: |-
+      if (id(internal_humidity_state).state == 0) {
+        return {"good"};
+      } else if (id(internal_humidity_state).state == 1) {
+        return {"fair"};
+      } else {
+        return {"poor"};
+      }
+
+  - platform: template
+    id: "pm_1_0_state"
+    name: "PM 1 State"
+    lambda: |-
+      if (id(internal_pm_1_0_state).state == 0) {
+        return {"good"};
+      } else if (id(internal_pm_1_0_state).state == 1) {
+        return {"fair"};
+      } else {
+        return {"poor"};
+      }
+  - platform: template
+    id: "pm_2_5_state"
+    name: "PM 2.5 State"
+    lambda: |-
+      if (id(internal_pm_2_5_state).state == 0) {
+        return {"good"};
+      } else if (id(internal_pm_2_5_state).state == 1) {
+        return {"fair"};
+      } else {
+        return {"poor"};
+      }
+  - platform: template
+    id: "pm_4_0_state"
+    name: "PM 4 State"
+    lambda: |-
+      if (id(internal_pm_4_0_state).state == 0) {
+        return {"good"};
+      } else if (id(internal_pm_4_0_state).state == 1) {
+        return {"fair"};
+      } else {
+        return {"poor"};
+      }
+  - platform: template
+    id: "pm_10_0_state"
+    name: "PM 10 State"
+    lambda: |-
+      if (id(internal_pm_10_0_state).state == 0) {
+        return {"good"};
+      } else if (id(internal_pm_10_0_state).state == 1) {
+        return {"fair"};
+      } else {
+        return {"poor"};
+      }
+
+sensor:
+  - platform: template
+    id: internal_temperature_state
+    internal: True
+    update_interval: never
+    lambda:
+      if (id(sht4x_temperature).state >= id(temperature_good_min).state && id(sht4x_temperature).state <= id(temperature_good_max).state) {
+        return 0;
+      } else if (id(sht4x_temperature).state >= id(temperature_fair_min).state && id(sht4x_temperature).state <= id(temperature_fair_max).state) {
+        return 1;
+      } else {
+        return 2;
+      }
+    on_value: 
+      then:
+        - component.update: temperature_state
+        - component.update: state
+  - platform: template
+    id: internal_humidity_state
+    internal: True
+    update_interval: never
+    lambda:
+      if (id(sht4x_humidity).state >= id(humidity_good_min).state && id(sht4x_humidity).state <= id(humidity_good_max).state) {
+        return 0;
+      } else if (id(sht4x_humidity).state >= id(humidity_fair_min).state && id(sht4x_humidity).state <= id(humidity_fair_max).state) {
+        return 1;
+      } else {
+        return 2;
+      }
+    on_value: 
+      then:
+        - component.update: humidity_state
+        - component.update: state
+
+  - platform: template
+    id: internal_pm_1_0_state
+    internal: True
+    update_interval: never
+    lambda:
+      if (id(sen55_pm_1_0).state >= id(pm_good_min).state && id(sen55_pm_1_0).state <= id(pm_good_max).state) {
+        return 0;
+      } else if (id(sen55_pm_1_0).state >= id(pm_fair_min).state && id(sen55_pm_1_0).state <= id(pm_fair_max).state) {
+        return 1;
+      } else {
+        return 2;
+      }
+    on_value: 
+      then:
+        - component.update: pm_1_0_state
+        - component.update: state
+  - platform: template
+    id: internal_pm_2_5_state
+    internal: True
+    update_interval: never
+    lambda:
+      if (id(sen55_pm_2_5).state >= id(pm_good_min).state && id(sen55_pm_2_5).state <= id(pm_good_max).state) {
+        return 0;
+      } else if (id(sen55_pm_2_5).state >= id(pm_fair_min).state && id(sen55_pm_2_5).state <= id(pm_fair_max).state) {
+        return 1;
+      } else {
+        return 2;
+      }
+    on_value: 
+      then:
+        - component.update: pm_2_5_state
+        - component.update: state
+  - platform: template
+    id: internal_pm_4_0_state
+    internal: True
+    update_interval: never
+    lambda:
+      if (id(sen55_pm_4_0).state >= id(pm_good_min).state && id(sen55_pm_4_0).state <= id(pm_good_max).state) {
+        return 0;
+      } else if (id(sen55_pm_4_0).state >= id(pm_fair_min).state && id(sen55_pm_4_0).state <= id(pm_fair_max).state) {
+        return 1;
+      } else {
+        return 2;
+      }
+    on_value: 
+      then:
+        - component.update: pm_4_0_state
+        - component.update: state
+  - platform: template
+    id: internal_pm_10_0_state
+    internal: True
+    update_interval: never
+    lambda:
+      if (id(sen55_pm_10_0).state >= id(pm_good_min).state && id(sen55_pm_10_0).state <= id(pm_good_max).state) {
+        return 0;
+      } else if (id(sen55_pm_10_0).state >= id(pm_fair_min).state && id(sen55_pm_10_0).state <= id(pm_fair_max).state) {
+        return 1;
+      } else {
+        return 2;
+      }
+    on_value: 
+      then:
+        - component.update: pm_10_0_state
+        - component.update: state
+
+
+number:
+  - platform: template
+    id: temperature_good_min
+    name: Temperature Good Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: -40
+    max_value: 125
+    initial_value: 18
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: °C
+    set_action: 
+      then:
+        - component.update: internal_temperature_state
+  - platform: template
+    id: temperature_good_max
+    name: Temperature Good Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: -40
+    max_value: 125
+    initial_value: 21
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: °C
+    set_action: 
+      then:
+        - component.update: internal_temperature_state
+  - platform: template
+    id: temperature_fair_min
+    name: Temperature Fair Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: -40
+    max_value: 125
+    initial_value: 13
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: °C
+    set_action: 
+      then:
+        - component.update: internal_temperature_state
+  - platform: template
+    id: temperature_fair_max
+    name: Temperature Fair Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: -40
+    max_value: 125
+    initial_value: 24
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: °C
+    set_action: 
+      then:
+        - component.update: internal_temperature_state
+
+
+
+  - platform: template
+    id: humidity_good_min
+    name: Humidity Good Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 100
+    initial_value: 30
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "%"
+    set_action: 
+      then:
+        - component.update: internal_humidity_state
+  - platform: template
+    id: humidity_good_max
+    name: Humidity Good Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 100
+    initial_value: 60
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "%"
+    set_action: 
+      then:
+        - component.update: internal_humidity_state
+  - platform: template
+    id: humidity_fair_min
+    name: Humidity Fair Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 100
+    initial_value: 25
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "%"
+    set_action: 
+      then:
+        - component.update: internal_humidity_state
+  - platform: template
+    id: humidity_fair_max
+    name: Humidity Fair Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 100
+    initial_value: 70
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "%"
+    set_action: 
+      then:
+        - component.update: internal_humidity_state
+
+
+
+  - platform: template
+    id: pm_good_min
+    name: PM Good Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 0
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    set_action: 
+      then:
+        - component.update: internal_pm_1_0_state
+        - component.update: internal_pm_2_5_state
+        - component.update: internal_pm_4_0_state
+        - component.update: internal_pm_10_0_state
+  - platform: template
+    id: pm_good_max
+    name: PM Good Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 10
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    set_action: 
+      then:
+        - component.update: internal_pm_1_0_state
+        - component.update: internal_pm_2_5_state
+        - component.update: internal_pm_4_0_state
+        - component.update: internal_pm_10_0_state
+  - platform: template
+    id: pm_fair_min
+    name: PM Fair Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 10
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    set_action: 
+      then:
+        #- if: 
+        #    condition: 
+        #      - lambda: 
+        #          return x >= id(pm_fair_max).state;
+        #    then: 
+        #      - number.set: 
+        #          id: pm_fair_max
+        #          value: !lambda return x + 1;
+        #- if: 
+        #    condition: 
+        #      - lambda: 
+        #          return x >= id(pm_good_min).state;
+        #    then: 
+        #      - number.set: 
+        #          id: pm_good_min
+        #          value: !lambda return x + 1;
+        - component.update: internal_pm_1_0_state
+        - component.update: internal_pm_2_5_state
+        - component.update: internal_pm_4_0_state
+        - component.update: internal_pm_10_0_state
+  - platform: template
+    id: pm_fair_max
+    name: PM Fair Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 25
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    set_action: 
+      then:
+        - component.update: internal_pm_1_0_state
+        - component.update: internal_pm_2_5_state
+        - component.update: internal_pm_4_0_state
+        - component.update: internal_pm_10_0_state
