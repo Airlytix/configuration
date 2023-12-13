@@ -2,6 +2,24 @@ output:
   - platform: gpio
     id: status_led_2
     pin: GPIO13
+  - platform: ledc
+    id: indicator_led_r
+    pin: GPIO25
+    inverted: True
+    min_power: 0
+    max_power: ${indicator_max_power}
+  - platform: ledc
+    id: indicator_led_g
+    pin: GPIO26
+    inverted: True
+    min_power: 0
+    max_power: ${indicator_max_power}
+  - platform: ledc
+    id: indicator_led_b
+    pin: GPIO33 
+    inverted: True
+    min_power: 0
+    max_power: ${indicator_max_power}
 
 
 status_led:

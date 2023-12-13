@@ -3,6 +3,7 @@ substitutions:
   friendly_name: "Airlytix"
   project_name: "airlytix.es1"
   project_version: "1.0.0"
+  indicator_max_power: "0.1"
 
 esphome:
   name: ${name}
@@ -39,6 +40,9 @@ esp32_improv:
 improv_serial:
 
 <<: !include hardware/es1/rev1.0.yaml
+
+packages:
+  indicator_led: !include components/indicator_led.yaml
 
 interval:
   - interval: 1s
