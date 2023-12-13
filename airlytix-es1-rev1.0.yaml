@@ -2,7 +2,7 @@ substitutions:
   name: "airlytix"
   friendly_name: "Airlytix"
   project_name: "airlytix.es1"
-  project_version: "0.0.1"
+  project_version: "0.0.2"
   indicator_max_power: "0.1"
 
 esphome:
@@ -43,6 +43,7 @@ improv_serial:
 
 packages:
   indicator_led: !include components/indicator_led.yaml
+  diagnostics: !include components/diagnostics.yaml
 
 interval:
   - interval: 1s
