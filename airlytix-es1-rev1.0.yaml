@@ -18,9 +18,10 @@ esphome:
 esp32:
   board: esp32dev
   framework:
-    type: arduino
+    type: esp-idf
+    version: recommended
 
-#logger:
+logger:
 
 api:
 
@@ -46,7 +47,7 @@ improv_serial:
 packages:
   indicator_led: !include partial_configs/indicator_led.yaml
   diagnostics: !include partial_configs/diagnostics.yaml
-  temp_sensor: !include partial_configs/sensors.yaml
+  sensors: !include partial_configs/sensors.yaml
   state: !include partial_configs/state.yaml
 
 interval:
@@ -71,26 +72,3 @@ interval:
           - delay: 200ms
           - output.turn_off: status_led_2
           - delay: 200ms
-
-debug:
-  update_interval: 5s
-
-text_sensor:
-  - platform: debug
-    device:
-      name: "Device Info"
-    reset_reason:
-      name: "Reset Reason"
-
-sensor:
-  - platform: debug
-    free:
-      name: "Heap Free"
-    block:
-      name: "Heap Max Block"
-    loop_time:
-      name: "Loop Time"
-
-# Logger must be at least debug (default)
-logger:
-  level: debug

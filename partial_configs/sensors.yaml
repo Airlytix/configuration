@@ -1,6 +1,6 @@
-esphome:
-  includes:
-    - components/veml6040/VEML6040.h
+# esphome:
+#   includes:
+#     - components/veml6040/VEML6040.h
 
 #external_components:
 #  - source: github://stas-sl/esphome-sound-level-meter@v1.0.3
@@ -8,10 +8,25 @@ esphome:
 
 sensor:
   - platform: scd4x
+    address: 0x62
+    automatic_self_calibration: true
+    measurement_mode: low_power_periodic
+    update_interval: 30s
     ambient_pressure_compensation_source: dps310_pressure
     co2:
       name: "CO2"
       id: "scd4x_co2"
+      on_value: 
+        then:
+          - lambda: |-
+              if (x >= id(co2_good_min).state && x <= id(co2_good_max).state) {
+                id(co2_state).publish_state("good");
+              } else if (x >= id(co2_fair_min).state && x <= id(co2_fair_max).state) {
+                id(co2_state).publish_state("fair");
+              } else {
+                id(co2_state).publish_state("poor");
+              }
+          - component.update: state
     temperature:
       disabled_by_default: True
       internal: True
@@ -22,26 +37,51 @@ sensor:
       id: "scd4x_humidity"
 
   - platform: sht4x
+    id: sht4x_sensor
+    address: 0x44
+    update_interval: 60s
+    precision: High
+    heater_max_duty: 0.0
     temperature:
       id: sht4x_temperature
       name: "Temperature"
       filters: 
         - offset: ${sht4x_temperature_offset}
+        - lambda: "return x + id(temperature_offset_ui).state;"
       on_value: 
         then:
-          - component.update: internal_temperature_state
+          - lambda: |-
+              if (x >= id(temperature_good_min).state && x <= id(temperature_good_max).state) {
+                id(temperature_state).publish_state("good");
+              } else if (x >= id(temperature_fair_min).state && x <= id(temperature_fair_max).state) {
+                id(temperature_state).publish_state("fair");
+              } else {
+                id(temperature_state).publish_state("poor");
+              }
+          - component.update: state
+
     humidity:
       id: sht4x_humidity
       name: "Humidity"
       filters: 
         - offset: ${sht4x_humidity_offset}
+        - lambda: "return x + id(humidity_offset_ui).state;"
       on_value: 
         then:
-          - component.update: internal_humidity_state
-    update_interval: 60s
+          - lambda: |-
+              if (x >= id(humidity_good_min).state && x <= id(humidity_good_max).state) {
+                id(humidity_state).publish_state("good");
+              } else if (x >= id(humidity_fair_min).state && x <= id(humidity_fair_max).state) {
+                id(humidity_state).publish_state("fair");
+              } else {
+                id(humidity_state).publish_state("poor");
+              }
+          - component.update: state
 
 
   - platform: dps310
+    address: 0x77
+    update_interval: 120s
     temperature:
       disabled_by_default: True
       internal: True
@@ -49,39 +89,72 @@ sensor:
     pressure:
       name: "Pressure"
       id: "dps310_pressure"
-    address: 0x77
-    update_interval: 120s
 
   - platform: sen5x
-    id: sen55
+    acceleration_mode: low
+    store_baseline: true
+    address: 0x69
+    update_interval: 10s
     pm_1_0:
       name: "PM <1µm Weight concentration"
-      id: "sen55_pm_1_0"
+      id: "sen55_pm1_0"
       accuracy_decimals: 1
       on_value: 
         then:
-          - component.update: internal_pm_1_0_state
+          - lambda: |-
+              if (x >= id(pm1_0_good_min).state && x <= id(pm1_0_good_max).state) {
+                id(pm1_0_state).publish_state("good");
+              } else if (x >= id(pm1_0_fair_min).state && x <= id(pm1_0_fair_max).state) {
+                id(pm1_0_state).publish_state("fair");
+              } else {
+                id(pm1_0_state).publish_state("poor");
+              }
+          - component.update: state
     pm_2_5:
       name: "PM <2.5µm Weight concentration"
-      id: "sen55_pm_2_5"
+      id: "sen55_pm2_5"
       accuracy_decimals: 1
       on_value: 
         then:
-          - component.update: internal_pm_2_5_state
+          - lambda: |-
+              if (x >= id(pm2_5_good_min).state && x <= id(pm2_5_good_max).state) {
+                id(pm2_5_state).publish_state("good");
+              } else if (x >= id(pm2_5_fair_min).state && x <= id(pm2_5_fair_max).state) {
+                id(pm2_5_state).publish_state("fair");
+              } else {
+                id(pm2_5_state).publish_state("poor");
+              }
+          - component.update: state
     pm_4_0:
       name: "PM <4µm Weight concentration"
-      id: "sen55_pm_4_0"
+      id: "sen55_pm4_0"
       accuracy_decimals: 1
       on_value: 
         then:
-          - component.update: internal_pm_4_0_state
+          - lambda: |-
+              if (x >= id(pm4_0_good_min).state && x <= id(pm4_0_good_max).state) {
+                id(pm4_0_state).publish_state("good");
+              } else if (x >= id(pm4_0_fair_min).state && x <= id(pm4_0_fair_max).state) {
+                id(pm4_0_state).publish_state("fair");
+              } else {
+                id(pm4_0_state).publish_state("poor");
+              }
+          - component.update: state
     pm_10_0:
       name: "PM <10µm Weight concentration"
-      id: "sen55_pm_10_0"
+      id: "sen55_pm10_0"
       accuracy_decimals: 1
       on_value: 
         then:
-          - component.update: internal_pm_10_0_state
+          - lambda: |-
+              if (x >= id(pm10_0_good_min).state && x <= id(pm10_0_good_max).state) {
+                id(pm10_0_state).publish_state("good");
+              } else if (x >= id(pm10_0_fair_min).state && x <= id(pm10_0_fair_max).state) {
+                id(pm10_0_state).publish_state("fair");
+              } else {
+                id(pm10_0_state).publish_state("poor");
+              }
+          - component.update: state
     temperature:
       disabled_by_default: true
       internal: true
@@ -93,66 +166,152 @@ sensor:
     voc:
       name: "VOC"
       id: "sen55_voc"
+      algorithm_tuning:
+        index_offset: 100
+        learning_time_offset_hours: 12
+        learning_time_gain_hours: 12
+        gating_max_duration_minutes: 180
+        std_initial: 50
+        gain_factor: 230
+      on_value: 
+        then:
+          - lambda: |-
+              if (x >= id(voc_good_min).state && x <= id(voc_good_max).state) {
+                id(voc_state).publish_state("good");
+              } else if (x >= id(voc_fair_min).state && x <= id(voc_fair_max).state) {
+                id(voc_state).publish_state("fair");
+              } else {
+                id(voc_state).publish_state("poor");
+              }
+          - component.update: state
     nox:
       name: "NOX"
       id: "sen55_nox"
+      algorithm_tuning:
+        index_offset: 100
+        learning_time_offset_hours: 12
+        learning_time_gain_hours: 12
+        gating_max_duration_minutes: 180
+        std_initial: 50
+        gain_factor: 230
+      on_value: 
+        then:
+          - lambda: |-
+              if (x >= id(nox_good_min).state && x <= id(nox_good_max).state) {
+                id(nox_state).publish_state("good");
+              } else if (x >= id(nox_fair_min).state && x <= id(nox_fair_max).state) {
+                id(nox_state).publish_state("fair");
+              } else {
+                id(nox_state).publish_state("poor");
+              }
+          - component.update: state
     temperature_compensation:
       offset: 0
       normalized_offset_slope: 0
       time_constant: 0
-    acceleration_mode: low
-    store_baseline: true
-    address: 0x69
-    update_interval: 60s
 
   
-  - platform: custom
-    lambda: |-
-      auto veml6040 = new VEML6040CustomSensor();
-      App.register_component(veml6040);
-      return {veml6040->ambient_light, veml6040->color_temp};
-  
-    sensors:
-    - name: "Ambient Light"
-      id: veml6040_lx
-      unit_of_measurement: lx
-      device_class: ILLUMINANCE
-      state_class: measurement
-      accuracy_decimals: 2
-    - name: "Ambient Light CCT"
-      id: veml6040_cct
-      state_class: measurement
+  # - platform: custom
+  #   id: veml6040_sensor
+  #   lambda: |-
+  #     auto veml6040 = new VEML6040CustomSensor();
+  #     App.register_component(veml6040);
+  #     return {veml6040->ambient_light, veml6040->color_temp};  
+  #   sensors:
+  #   - name: "Ambient Light"
+  #     id: veml6040_lx
+  #     unit_of_measurement: lx
+  #     device_class: ILLUMINANCE
+  #     state_class: measurement
+  #     accuracy_decimals: 2
+  #     filters:
+  #       - lambda: "return x + id(illuminance_offset_ui).state;"
+  #   - name: "Ambient Light CCT"
+  #     id: veml6040_cct
+  #     state_class: measurement
 #
-#sound_level_meter:
-#  update_interval: 60s           # default: 60s
-#  is_on: true                    # default: true
-#  buffer_size: 1024             # default: 1024
-#  warmup_interval: 500ms        # default: 500ms
-#  task_stack_size: 4096         # default: 4096
-#  task_priority: 2              # default: 2
-#  task_core: 1                  # default: 1
-#  mic_sensitivity: -26dB        # default: empty
-#  mic_sensitivity_ref: 94dB     # default: empty
-#  offset: 0dB                   # default: empty
-#  groups:
-#
-#        # group 1.2 (A-weighting)
-#        - filters:
-#            # for now only SOS filter type is supported, see math/filter-design.ipynb
-#            # to learn how to create or convert other filter types to SOS
-#            - type: sos
-#              coeffs:
-#                # A-weighting:
-#                #       b0           b1            b2             a1            a2
-#                - [ 0.16999495 ,  0.741029   ,  0.52548885 , -0.11321865 , -0.056549273]
-#                - [ 1.         , -2.00027    ,  1.0002706  , -0.03433284 , -0.79215795 ]
-#                - [ 1.         , -0.709303   , -0.29071867 , -1.9822421  ,  0.9822986  ]
-#          sensors:
-#            - type: eq
-#              name: Ambient Sound Level (LAeq_1min)
-#              id: soundlevel_laeq_1min
-#              unit_of_measurement: dBA
-#            - type: peak
-#              name: Ambient Sound Level (LApeak_1min)
-#              id: soundlevel_lapeak_1min
-#              unit_of_measurement: dBA
+# #sound_level_meter:
+# #  update_interval: 60s           # default: 60s
+# #  is_on: true                    # default: true
+# #  buffer_size: 1024             # default: 1024
+# #  warmup_interval: 500ms        # default: 500ms
+# #  task_stack_size: 4096         # default: 4096
+# #  task_priority: 2              # default: 2
+# #  task_core: 1                  # default: 1
+# #  mic_sensitivity: -26dB        # default: empty
+# #  mic_sensitivity_ref: 94dB     # default: empty
+# #  offset: 0dB                   # default: empty
+# #  groups:
+# #
+# #        # group 1.2 (A-weighting)
+# #        - filters:
+# #            # for now only SOS filter type is supported, see math/filter-design.ipynb
+# #            # to learn how to create or convert other filter types to SOS
+# #            - type: sos
+# #              coeffs:
+# #                # A-weighting:
+# #                #       b0           b1            b2             a1            a2
+# #                - [ 0.16999495 ,  0.741029   ,  0.52548885 , -0.11321865 , -0.056549273]
+# #                - [ 1.         , -2.00027    ,  1.0002706  , -0.03433284 , -0.79215795 ]
+# #                - [ 1.         , -0.709303   , -0.29071867 , -1.9822421  ,  0.9822986  ]
+# #          sensors:
+# #            - type: eq
+# #              name: Ambient Sound Level (LAeq_1min)
+# #              id: soundlevel_laeq_1min
+# #              unit_of_measurement: dBA
+# #            - type: peak
+# #              name: Ambient Sound Level (LApeak_1min)
+# #              id: soundlevel_lapeak_1min
+# #              unit_of_measurement: dBA
+
+number:
+  - platform: template
+    name: "Temperature Offset"
+    id: temperature_offset_ui
+    unit_of_measurement: "°C"
+    min_value: -20
+    max_value: 20
+    step: 0.1
+    mode: box
+    update_interval: never
+    optimistic: true
+    restore_value: true
+    initial_value: 0
+    icon: "mdi:thermometer"
+    entity_category: config
+    on_value:
+      - component.update: sht4x_sensor
+
+  - platform: template
+    name: "Humidity Offset"
+    id: humidity_offset_ui
+    unit_of_measurement: "%"
+    min_value: -50
+    max_value: 50
+    step: 0.1
+    mode: box
+    update_interval: never
+    optimistic: true
+    restore_value: true
+    initial_value: 0
+    icon: "mdi:water-percent"
+    entity_category: config
+    on_value:
+      - component.update: sht4x_sensor
+
+  - platform: template
+    name: "Ambient Light Offset"
+    id: illuminance_offset_ui
+    unit_of_measurement: "lx"
+    min_value: -50
+    max_value: 50
+    step: 1
+    mode: box
+    update_interval: never
+    optimistic: true
+    restore_value: true
+    initial_value: 0
+    icon: "mdi:brightness-5"
+    entity_category: config
+    #on_value:
+      #- component.update: veml6040_sensor TODO
