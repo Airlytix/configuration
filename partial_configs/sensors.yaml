@@ -1,9 +1,11 @@
 esphome:
   includes:
-    - components/custom/veml6040/VEML6040.h
+    #- github://airlytix/configuration/components/custom/veml6040/VEML6040.h
 
 external_components:
   - source: github://stas-sl/esphome-sound-level-meter@v1.0.3
+  - source: github://airlytix/configuration
+
 
 sensor:
   - platform: scd4x
