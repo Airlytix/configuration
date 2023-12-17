@@ -31,6 +31,10 @@ dashboard_import:
   package_import_url: github://airlytix/configuration/airlytix-es1-rev1.0.yaml@beta
   import_full_config: false
 
+external_components:
+#  - source: github://stas-sl/esphome-sound-level-meter@v1.0.3
+  - source: github://airlytix/configuration@beta
+
 wifi:
   ap:
     password: "tbJWe4T7rD"

@@ -39,7 +39,7 @@ namespace esphome
             uint8_t conf = 0;
             conf |= (this->integration_reg_ << 4);
             conf |= (VEML6040_TRIG_DISABLE | VEML6040_AF_AUTO | VEML6040_SD_ENABLE);
-            ESP_LOGD(TAG, "Conf=%d", conf)
+            ESP_LOGD(TAG, "Conf=%d", conf);
 
             if (this->write_config_register_(VEML6040_REGISTER_CONTROL, conf) != i2c::ERROR_OK)
             {
