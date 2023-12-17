@@ -1,7 +1,6 @@
-# esphome:
-#   includes:
-#     - components/veml6040/VEML6040.h
-
+ esphome:
+   includes:
+     - components/veml6040
 #external_components:
 #  - source: github://stas-sl/esphome-sound-level-meter@v1.0.3
 
@@ -209,6 +208,19 @@ sensor:
       offset: 0
       normalized_offset_slope: 0
       time_constant: 0
+
+  - platform: veml6040
+    color_temperature:
+      name: "Ambient Light CCT"
+      id: veml6040_color_temperature
+    illuminance:
+      name: "Ambient Light"
+      id: veml6040_illuminance
+      filters:
+        - lambda: "return x + id(illuminance_offset_ui).state;"
+
+
+
 
   
   # - platform: custom
