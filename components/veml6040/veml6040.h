@@ -40,14 +40,15 @@ namespace esphome
       i2c::ErrorCode read_data_register_(uint8_t a_register, uint16_t &data)
       {
         uint8_t buffer[2];
-        auto retval = this->read_register(a_register, buffer, 2);
-        if (retval == i2c::ERROR_OK)
+        auto retval = this->read_register(a_register, buffer, 2, false);
+        if (retval == i2c::ERROR_OK) {
           data = (uint16_t(buffer[1]) << 8) | (uint16_t(buffer[0]) & 0xFF);
+        }
         return retval;
       }
-      i2c::ErrorCode write_config_register_(uint8_t a_register, uint8_t data)
+      i2c::ErrorCode write_config_register_(uint8_t a_register, uint8_t *data, size_t len)
       {
-        return this->write_register(a_register, &data, 1);
+        return this->write_register(a_register, data, len);
       }
       sensor::Sensor *illuminance_sensor_{nullptr};
       sensor::Sensor *color_temperature_sensor_{nullptr};
@@ -58,7 +59,7 @@ namespace esphome
 
     private:
       void calculate_temperature_and_lux_(uint16_t r, uint16_t g, uint16_t b, uint16_t c);
-      uint16_t integration_reg_;
+      uint16_t integration_reg_{VEML6040_INTEGRATION_TIME_80MS};
     };
   }
 }

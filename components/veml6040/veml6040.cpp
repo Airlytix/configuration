@@ -25,12 +25,12 @@ namespace esphome
 
         // G SENSITIVITY
 
-        static const uint8_t VEML6040_GSENS_40MS = 0.25168;
-        static const uint8_t VEML6040_GSENS_80MS = 0.12584;
-        static const uint8_t VEML6040_GSENS_160MS = 0.06292;
-        static const uint8_t VEML6040_GSENS_320MS = 0.03146;
-        static const uint8_t VEML6040_GSENS_640MS = 0.01573;
-        static const uint8_t VEML6040_GSENS_1280MS = 0.007865;
+        static const float VEML6040_GSENS_40MS = 0.25168;
+        static const float VEML6040_GSENS_80MS = 0.12584;
+        static const float VEML6040_GSENS_160MS = 0.06292;
+        static const float VEML6040_GSENS_320MS = 0.03146;
+        static const float VEML6040_GSENS_640MS = 0.01573;
+        static const float VEML6040_GSENS_1280MS = 0.007865;
 
         void VEML6040Component::setup()
         {
@@ -39,9 +39,10 @@ namespace esphome
             uint8_t conf = 0;
             conf |= (this->integration_reg_ << 4);
             conf |= (VEML6040_TRIG_DISABLE | VEML6040_AF_AUTO | VEML6040_SD_ENABLE);
-            ESP_LOGD(TAG, "Conf=%d", conf);
 
-            if (this->write_config_register_(VEML6040_REGISTER_CONTROL, conf) != i2c::ERROR_OK)
+            uint8_t config_data[2]{conf, 0x00};
+
+            if (this->write_config_register_(VEML6040_REGISTER_CONTROL, config_data, 2) != i2c::ERROR_OK)
             {
                 this->mark_failed();
                 return;
@@ -74,9 +75,9 @@ namespace esphome
                 return;
             }
 
-            this->illuminance_ = g * this->sensitivity;
+            this->illuminance_ = (float)g * this->sensitivity;
 
-            float ccti_raw = (r-b)/g;
+            float ccti_raw = (float)((r-b)/(float)g);
             float ccti = ccti_raw + this->glass_attenuation_;
             this->color_temperature_ = 4278.6 * pow(ccti, -1.2455);
         }
