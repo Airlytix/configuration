@@ -31,18 +31,13 @@ i2c:
   scan: true
   id: i2c_bus_a
 
-#i2s:
-#  bck_pin: GPIO4
-#  ws_pin: GPIO27
-#  din_pin: GPIO14
-#  sample_rate: 48000            # default: 48000
-#  bits_per_sample: 32           # default: 32
-#  dma_buf_count: 8              # default: 8
-#  dma_buf_len: 256              # default: 256
-#  use_apll: true                # default: false
-#
-#  # right shift samples.
-#  # for example if mic has 24 bit resolution, and
-#  # i2s configured as 32 bits, then audio data will be aligned left (MSB)
-#  # and LSB will be padded with zeros, so you might want to shift them right by 8 bits
-#  bits_shift: 8                 # default: 0
+i2s:
+ bck_pin: GPIO4
+ ws_pin: GPIO27
+ din_pin: GPIO14
+ sample_rate: 48000
+ bits_per_sample: 32
+ dma_buf_count: 8
+ dma_buf_len: 256
+ use_apll: true
+ bits_shift: 8

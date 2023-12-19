@@ -2,7 +2,7 @@ substitutions:
   name: "airlytix"
   friendly_name: "Airlytix"
   project_name: "airlytix.es1"
-  project_version: "0.0.7"
+  project_version: "0.0.8"
   indicator_max_power: "0.1"
   sht4x_temperature_offset: "0"
   sht4x_humidity_offset: "0"
@@ -32,7 +32,7 @@ dashboard_import:
   import_full_config: false
 
 external_components:
-#  - source: github://stas-sl/esphome-sound-level-meter@v1.0.3
+  - source: github://stas-sl/esphome-sound-level-meter@v1.0.3
   - source: github://airlytix/configuration@beta
 
 wifi:

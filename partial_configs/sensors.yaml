@@ -214,61 +214,42 @@ sensor:
         - lambda: "return x + id(illuminance_offset_ui).state;"
 
 
+sound_level_meter:
+ update_interval: 60s
+ is_on: true
+ buffer_size: 1024
+ warmup_interval: 500ms
+ task_stack_size: 4096
+ task_priority: 2
+ task_core: 1
+ mic_sensitivity: -26dB
+ mic_sensitivity_ref: 94dB
+ offset: 0dB
+ groups:
+  - filters:
+      - type: sos
+        coeffs:
+          # ICS-43434:
+          - [ 0.47732642,  0.46294358, 0.11224797, 0.06681948, 0.00111522]
+          - [ 1.,         -1.9890593,  0.98908925, -1.9975533, 0.99755484]
 
-
-  
-  # - platform: custom
-  #   id: veml6040_sensor
-  #   lambda: |-
-  #     auto veml6040 = new VEML6040CustomSensor();
-  #     App.register_component(veml6040);
-  #     return {veml6040->ambient_light, veml6040->color_temp};  
-  #   sensors:
-  #   - name: "Ambient Light"
-  #     id: veml6040_lx
-  #     unit_of_measurement: lx
-  #     device_class: ILLUMINANCE
-  #     state_class: measurement
-  #     accuracy_decimals: 2
-  #     filters:
-  #       - lambda: "return x + id(illuminance_offset_ui).state;"
-  #   - name: "Ambient Light CCT"
-  #     id: veml6040_cct
-  #     state_class: measurement
-#
-# #sound_level_meter:
-# #  update_interval: 60s           # default: 60s
-# #  is_on: true                    # default: true
-# #  buffer_size: 1024             # default: 1024
-# #  warmup_interval: 500ms        # default: 500ms
-# #  task_stack_size: 4096         # default: 4096
-# #  task_priority: 2              # default: 2
-# #  task_core: 1                  # default: 1
-# #  mic_sensitivity: -26dB        # default: empty
-# #  mic_sensitivity_ref: 94dB     # default: empty
-# #  offset: 0dB                   # default: empty
-# #  groups:
-# #
-# #        # group 1.2 (A-weighting)
-# #        - filters:
-# #            # for now only SOS filter type is supported, see math/filter-design.ipynb
-# #            # to learn how to create or convert other filter types to SOS
-# #            - type: sos
-# #              coeffs:
-# #                # A-weighting:
-# #                #       b0           b1            b2             a1            a2
-# #                - [ 0.16999495 ,  0.741029   ,  0.52548885 , -0.11321865 , -0.056549273]
-# #                - [ 1.         , -2.00027    ,  1.0002706  , -0.03433284 , -0.79215795 ]
-# #                - [ 1.         , -0.709303   , -0.29071867 , -1.9822421  ,  0.9822986  ]
-# #          sensors:
-# #            - type: eq
-# #              name: Ambient Sound Level (LAeq_1min)
-# #              id: soundlevel_laeq_1min
-# #              unit_of_measurement: dBA
-# #            - type: peak
-# #              name: Ambient Sound Level (LApeak_1min)
-# #              id: soundlevel_lapeak_1min
-# #              unit_of_measurement: dBA
+    groups:
+      - filters:
+          - type: sos
+            coeffs:
+              # A-weighting:
+              - [ 0.16999495 ,  0.741029   ,  0.52548885 , -0.11321865 , -0.056549273]
+              - [ 1.         , -2.00027    ,  1.0002706  , -0.03433284 , -0.79215795 ]
+              - [ 1.         , -0.709303   , -0.29071867 , -1.9822421  ,  0.9822986  ]
+        sensors:
+          - type: eq
+            name: Ambient Sound Level (LAeq_1min)
+            id: soundlevel_laeq_1min
+            unit_of_measurement: dBA
+          - type: peak
+            name: Ambient Sound Level (LApeak_1min)
+            id: soundlevel_lapeak_1min
+            unit_of_measurement: dBA
 
 number:
   - platform: template
