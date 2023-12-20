@@ -19,14 +19,6 @@ sensor:
                 id(co2_state).publish_state("poor");
               }
           - component.update: state
-    temperature:
-      disabled_by_default: True
-      internal: True
-      id: "scd4x_temperature"
-    humidity:
-      disabled_by_default: True
-      internal: True
-      id: "scd4x_humidity"
 
   - platform: sht4x
     id: sht4x_sensor
@@ -147,14 +139,6 @@ sensor:
                 id(pm10_0_state).publish_state("poor");
               }
           - component.update: state
-    temperature:
-      disabled_by_default: true
-      internal: true
-      id: "sen55_temperature"
-    humidity:
-      disabled_by_default: true
-      internal: true
-      id: "sen55_humidity"
     voc:
       name: "VOC"
       id: "sen55_voc"

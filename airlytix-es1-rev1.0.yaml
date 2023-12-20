@@ -2,7 +2,7 @@ substitutions:
   name: "airlytix"
   friendly_name: "Airlytix"
   project_name: "airlytix.es1"
-  project_version: "0.0.8"
+  project_version: "0.0.9"
   indicator_max_power: "0.1"
   sht4x_temperature_offset: "0"
   sht4x_humidity_offset: "0"
