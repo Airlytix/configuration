@@ -32,7 +32,7 @@ dashboard_import:
   import_full_config: false
 
 external_components:
-  - source: github://stas-sl/esphome-sound-level-meter@v1.0.3
+  - source: github://airlytix/esphome-sound-level-meter@main
   - source: github://airlytix/configuration@beta
 
 wifi:

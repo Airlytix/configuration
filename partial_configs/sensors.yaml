@@ -199,41 +199,41 @@ sensor:
 
 
 sound_level_meter:
- update_interval: 60s
- is_on: true
- buffer_size: 1024
- warmup_interval: 500ms
- task_stack_size: 4096
- task_priority: 2
- task_core: 1
- mic_sensitivity: -26dB
- mic_sensitivity_ref: 94dB
- offset: 0dB
- groups:
-  - filters:
-      - type: sos
-        coeffs:
-          # ICS-43434:
-          - [ 0.47732642,  0.46294358, 0.11224797, 0.06681948, 0.00111522]
-          - [ 1.,         -1.9890593,  0.98908925, -1.9975533, 0.99755484]
+  update_interval: 60s
+  is_on: true
+  buffer_size: 1024
+  warmup_interval: 500ms
+  task_stack_size: 4096
+  task_priority: 2
+  task_core: 1
+  mic_sensitivity: -26dB
+  mic_sensitivity_ref: 94dB
+  offset: 0dB
+  groups:
+    - filters:
+        - type: sos
+          coeffs:
+            # ICS-43434:
+            - [ 0.47732642,  0.46294358, 0.11224797, 0.06681948, 0.00111522]
+            - [ 1.,         -1.9890593,  0.98908925, -1.9975533, 0.99755484]
 
-    groups:
-      - filters:
-          - type: sos
-            coeffs:
-              # A-weighting:
-              - [ 0.16999495 ,  0.741029   ,  0.52548885 , -0.11321865 , -0.056549273]
-              - [ 1.         , -2.00027    ,  1.0002706  , -0.03433284 , -0.79215795 ]
-              - [ 1.         , -0.709303   , -0.29071867 , -1.9822421  ,  0.9822986  ]
-        sensors:
-          - type: eq
-            name: Ambient Sound Level (LAeq_1min)
-            id: soundlevel_laeq_1min
-            unit_of_measurement: dBA
-          - type: peak
-            name: Ambient Sound Level (LApeak_1min)
-            id: soundlevel_lapeak_1min
-            unit_of_measurement: dBA
+      groups:
+        - filters:
+            - type: sos
+              coeffs:
+                # A-weighting:
+                - [ 0.16999495 ,  0.741029   ,  0.52548885 , -0.11321865 , -0.056549273]
+                - [ 1.         , -2.00027    ,  1.0002706  , -0.03433284 , -0.79215795 ]
+                - [ 1.         , -0.709303   , -0.29071867 , -1.9822421  ,  0.9822986  ]
+          sensors:
+            - type: eq
+              name: Ambient Sound Level (LAeq_1min)
+              id: soundlevel_laeq_1min
+              unit_of_measurement: dBA
+            - type: peak
+              name: Ambient Sound Level (LApeak_1min)
+              id: soundlevel_lapeak_1min
+              unit_of_measurement: dBA
 
 number:
   - platform: template
