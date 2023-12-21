@@ -11,7 +11,15 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4.1.1
       - name: esphome build
+        id: esphome-build
         uses: esphome/build-action@v1.8.0
         with:
           yaml_file: "airlytix-es1-rev1.0.yaml"
           version: "2023.11.6"
+      - run: |
+          mkdir output
+          mv "${{ steps.esphome-build.outputs.name }}" output/
+      - uses: actions/upload-artifact@v3.1.2
+        with:
+          name: esphome
+          path: output
