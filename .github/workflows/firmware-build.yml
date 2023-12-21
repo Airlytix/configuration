@@ -1,0 +1,17 @@
+name: Build and Publish ESPHome firmware
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    name: Build ESPHome binary for xxxxxx
+    # needs; [prepare]
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4.1.1
+      - name: esphome build
+        uses: esphome/build-action@v1.8.0
+        with:
+          yaml_file: "airlytix-es1-rev1.0.yaml"
+          version: "2023.11.6"
