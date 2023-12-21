@@ -56,7 +56,7 @@ jobs:
           for subdirectory in output/*/; do
               name=$(basename "$subdirectory")
               echo "$name"
-              version=$(yq eval ".substitutions.project_version" "$name.yaml")
+              version=$(grep -E '^\s+project_version:' "$name.yaml" | awk '{print $2}' | tr -d '"')
               jq -s '{"name": "$name", "version": "$version", "home_assistant_domain": "airlytix", "new_install_skip_erase": false, "builds":.}' output/$name/manifest.json
           done
 
