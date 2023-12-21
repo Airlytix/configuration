@@ -19,7 +19,7 @@ jobs:
     needs: [list-configs]
     strategy:
         matrix:
-            config_file: ${{ fromJson(needs.list-manifests.outputs.matrix) }}
+            config_file: ${{ fromJson(needs.list-configs.outputs.matrix) }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout
