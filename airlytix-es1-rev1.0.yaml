@@ -1,5 +1,5 @@
 substitutions:
-  name: "airlytix"
+  name: "airlytix_es1_1_0"
   friendly_name: "Airlytix"
   project_name: "airlytix.es1"
   project_version: "0.0.9"
