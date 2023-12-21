@@ -32,7 +32,7 @@ jobs:
           version: "2023.11.6"
       - run: |
           mkdir output
-          filename=$(basename -- "$fullfile")
+          filename=$(basename -- "${{ matrix.config_file }}")
           filename="${filename%.*}"
           mv "${{ steps.esphome-build.outputs.name }}" output/$(filename)
       - uses: actions/upload-artifact@v3.1.2
@@ -53,7 +53,12 @@ jobs:
 
       - name: Create manifest files
         run: |
-          jq -s '{"name": "${{ inputs.name }}", "version": "${{ needs.build.outputs.esphome-version }}", "home_assistant_domain": "esphome", "new_install_skip_erase": false, "builds":.}' output/*/manifest.json > output/${{ inputs.manifest_filename }}
+          for d in output/ ; do
+              echo "$d"
+              name=$(echo "$d" | sed 's#/##')
+              jq -s '{"name": "$name", "version": "1.2.3", "home_assistant_domain": "airlytix", "new_install_skip_erase": false, "builds":.}' output/$name/manifest.json
+          done
+          
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.1
