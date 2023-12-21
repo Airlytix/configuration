@@ -53,11 +53,11 @@ jobs:
 
       - name: Create manifest files
         run: |
-          for subdirectory in "$parent_directory"/*/; do
-            name=$(basename "$subdirectory")
-            echo "$name
-            version=$(yq eval "substitutions.project_version" "$name.yaml")
-            jq -s '{"name": "$name", "version": "$version", "home_assistant_domain": "airlytix", "new_install_skip_erase": false, "builds":.}' output/$name/manifest.json
+          for subdirectory in output/*/; do
+              name=$(basename "$subdirectory")
+              echo "$name"
+              version=$(yq eval ".substitutions.project_version" "$name.yaml")
+              jq -s '{"name": "$name", "version": "$version", "home_assistant_domain": "airlytix", "new_install_skip_erase": false, "builds":.}' output/$name/manifest.json
           done
 
       - name: Deploy 🚀
