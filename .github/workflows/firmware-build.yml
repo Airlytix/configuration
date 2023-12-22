@@ -31,7 +31,8 @@ jobs:
           version: "2023.11.6"
       - run: |
           mkdir output
-          mv "${{ steps.esphome-build.outputs.name }}" output/${{ matrix.config_file }}
+          find "${{ steps.esphome-build.outputs.name }}" -type f -name "*.bin" -exec rsync --relative {} "output/${{ matrix.config_file }}" \;
+          mv "${{ steps.esphome-build.outputs.name }}/manifest.json" output/${{ matrix.config_file }}/manifest.json
       - uses: actions/upload-artifact@v4.0.0
         with:
           name: ${{ matrix.config_file }}
@@ -61,17 +62,19 @@ jobs:
 
       - name: Create manifest files
         run: |
+          mkdir gh-pages
           for subdirectory in output/*/; do
               name=$(basename "$subdirectory")
               echo $name
               version=$(grep -E '^\s+project_version:' "$name.yaml" | awk '{print $2}' | tr -d '"')
-              jq -s "{\"name\": \"$name\", \"version\": \"$version\", \"home_assistant_domain\": \"airlytix\", \"new_install_skip_erase\": false, \"builds\":.}" output/$name/manifest.json
+              jq -s "{\"name\": \"$name\", \"version\": \"$version\", \"home_assistant_domain\": \"airlytix\", \"new_install_skip_erase\": false, \"builds\":.}" output/$name/manifest.json > gh-pages/$name.json
+              find "output/$name" -type f -name "*.bin" -exec rsync --relative {} "gh-pages" \;
           done
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3.0.0
         with:
-          path: output
+          path: gh-pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4.0.0
