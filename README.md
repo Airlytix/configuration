@@ -6,9 +6,6 @@ This repository contains the configuration files needed to set up and run Airlyt
 
 ![Airlytix Device Image Placeholder](image_placeholder.png)
 
-## Repository Contents
-
-This repository contains the configuration files needed to set up and run Airlytix. These files are designed to be used with various Airlytix hardware.
 
 ## Official Documentation
 
