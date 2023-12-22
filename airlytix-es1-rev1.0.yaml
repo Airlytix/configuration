@@ -11,16 +11,12 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   name_add_mac_suffix: true
-  platformio_options:
-    board_build.flash_mode: dio
-    board_build.f_flash: 40000000L
   project:
     name: ${project_name}
     version: ${project_version}
 
 esp32:
   board: esp32dev
-  flash_size: 8MB
   framework:
     type: esp-idf
     version: recommended
