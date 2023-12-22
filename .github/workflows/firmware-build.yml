@@ -63,12 +63,15 @@ jobs:
       - name: Create manifest files
         run: |
           mkdir gh-pages
+          pagesDir=$(readlink -f gh-pages)
           for subdirectory in output/*/; do
               name=$(basename "$subdirectory")
               echo $name
               version=$(grep -E '^\s+project_version:' "$name.yaml" | awk '{print $2}' | tr -d '"')
-              jq -s "{\"name\": \"$name\", \"version\": \"$version\", \"home_assistant_domain\": \"airlytix\", \"new_install_skip_erase\": false, \"builds\":.}" output/$name/manifest.json > gh-pages/$name.json
-              find "output/$name" -type f -name "*.bin" -exec rsync --relative {} "gh-pages" \;
+              pushd "output/$name"
+              jq -s "{\"name\": \"$name\", \"version\": \"$version\", \"home_assistant_domain\": \"airlytix\", \"new_install_skip_erase\": false, \"builds\":.}" manifest.json > $pagesDir/$name.json
+              find . -type f -name "*.bin" -exec rsync --relative {} "$pagesDir" \;
+              popd
           done
 
       - name: Upload artifact
