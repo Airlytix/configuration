@@ -6,20 +6,19 @@ jobs:
   list-configs:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      names: ${{ steps.set-matrix.outputs.names }}
     steps:
       - uses: actions/checkout@v4.1.1
       - id: set-matrix
         run: |
-          echo "matrix=$(ls *.yaml | jq -R -s -c 'split("\n")[:-1]')"
-          echo "matrix=$(ls *.yaml | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+          echo "names=$(ls *.yaml | xargs -I{} basename {} | sed 's/\.[^.]*$//' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
 
   build:
     name: Build ESPHome binary for ${{ matrix.config_file }}
     needs: [list-configs]
     strategy:
         matrix:
-            config_file: ${{ fromJson(needs.list-configs.outputs.matrix) }}
+            config_file: ${{ fromJson(needs.list-configs.outputs.names) }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -28,16 +27,14 @@ jobs:
         id: esphome-build
         uses: esphome/build-action@v1.8.0
         with:
-          yaml_file:  ${{ matrix.config_file }}
+          yaml_file:  ${{ matrix.config_file }}.yaml
           version: "2023.11.6"
       - run: |
           mkdir output
-          filename=$(basename -- "${{ matrix.config_file }}")
-          filename="${filename%.*}"
-          mv "${{ steps.esphome-build.outputs.name }}" output/$(filename)
-      - uses: actions/upload-artifact@v3.1.2
+          mv "${{ steps.esphome-build.outputs.name }}" output/${{ matrix.config_file }}
+      - uses: actions/upload-artifact@v4.0.0
         with:
-          name: esphome-firmware
+          name: ${{ matrix.config_file }}
           path: output
 
   publish:
@@ -46,18 +43,18 @@ jobs:
     needs: [build]
     steps:
       - uses: actions/checkout@v4.1.1
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.0
         with:
           path: output
-          name: esphome-firmware
+          merge-multiple: true
 
       - name: Create manifest files
         run: |
           for subdirectory in output/*/; do
               name=$(basename "$subdirectory")
-              echo "$name"
+              echo $name
               version=$(grep -E '^\s+project_version:' "$name.yaml" | awk '{print $2}' | tr -d '"')
-              jq -s '{"name": "$name", "version": "$version", "home_assistant_domain": "airlytix", "new_install_skip_erase": false, "builds":.}' output/$name/manifest.json
+              jq -s "{\"name\": \"$name\", \"version\": \"$version\", \"home_assistant_domain\": \"airlytix\", \"new_install_skip_erase\": false, \"builds\":.}" output/$name/manifest.json
           done
 
       - name: Deploy 🚀
