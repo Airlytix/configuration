@@ -17,7 +17,7 @@ esphome:
 light:
   - platform: monochromatic
     id: indicator_light
-    name: "Indicator_light"
+    name: "Indicator Light"
     output: dummy_output
     default_transition_length: 0s
     restore_mode: RESTORE_AND_ON
