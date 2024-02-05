@@ -75,10 +75,10 @@ namespace esphome
                 return;
             }
 
-            this->illuminance_ = (float)g * this->sensitivity;
+            this->illuminance_ = (float)g * this->sensitivity * ga;
 
             float ccti_raw = (float)((r-b)/(float)g);
-            float ccti = ccti_raw + this->glass_attenuation_;
+            float ccti = ccti_raw + ga;
             this->color_temperature_ = 4278.6 * pow(ccti, -1.2455);
         }
 

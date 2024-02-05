@@ -56,9 +56,7 @@ CONFIG_SCHEMA = (
             cv.Optional(CONF_INTEGRATION_TIME, default="80ms"): cv.enum(
                 VEML6040_INTEGRATION_TIMES, lower=True
             ),
-            cv.Optional(CONF_GLASS_ATTENUATION_FACTOR, default=0.5): cv.float_range(
-                min=0.5
-            ),
+            cv.Optional(CONF_GLASS_ATTENUATION_FACTOR, default=0.5): cv.float_range(),
         }
     )
     .extend(cv.polling_component_schema("60s"))
