@@ -174,7 +174,7 @@ sensor:
 
   - platform: veml6040
     id: veml6040_sensor
-    glass_attenuation_factor: 0.421
+    glass_attenuation_factor: ${veml6040_glass_attenuation}
     color_temperature:
       name: "Ambient Light CCT"
       id: veml6040_color_temperature
