@@ -142,6 +142,13 @@ sensor:
     voc:
       name: "VOC"
       id: "sen55_voc"
+      algorithm_tuning:
+        index_offset: 100
+        learning_time_offset_hours: 12
+        learning_time_gain_hours: 12
+        gating_max_duration_minutes: 180
+        std_initial: 50
+        gain_factor: 230
       on_value: 
         then:
           - lambda: |-
@@ -156,6 +163,13 @@ sensor:
     nox:
       name: "NOX"
       id: "sen55_nox"
+      algorithm_tuning:
+        index_offset: 1
+        learning_time_offset_hours: 12
+        learning_time_gain_hours: 12
+        gating_max_duration_minutes: 180
+        std_initial: 50
+        gain_factor: 230
       on_value: 
         then:
           - lambda: |-
