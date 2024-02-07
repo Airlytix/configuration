@@ -75,7 +75,7 @@ namespace esphome
                 return;
             }
 
-            this->illuminance_ = (float)g * this->sensitivity * ga;
+            this->illuminance_ = (float)g * this->sensitivity;
 
             float ccti_raw = (float)((r-b)/(float)g);
             float ccti = ccti_raw + ga;

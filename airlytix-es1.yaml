@@ -4,9 +4,9 @@ substitutions:
   project_name: "airlytix.es1"
   project_version: "0.1.0"
   indicator_max_power: "1"
-  sht4x_temperature_offset: "0"
-  sht4x_humidity_offset: "0"
-  veml6040_glass_attenuation: "0.921"
+  sht4x_temperature_offset: "-3.5"
+  sht4x_humidity_offset: "6.5"
+  veml6040_glass_attenuation: "0.42"
 
 esphome:
   name: ${name}
