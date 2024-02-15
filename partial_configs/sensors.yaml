@@ -12,7 +12,7 @@ sensor:
 
   - platform: kalman_combinator
     name: "Humidity Combined"
-    unit_of_measurement: %
+    unit_of_measurement: "%"
     process_std_dev: 0.001
     sources:
       - source: sht4x_humidity
