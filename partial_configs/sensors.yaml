@@ -1,4 +1,16 @@
 sensor:
+
+  - platform: kalman_combinator
+    name: "Temperature Combined"
+    unit_of_measurement: °C
+    process_std_dev: 0.001
+    sources:
+      - source: sht4x_temperature
+        error: 1.0
+      - source: sen55_temperature
+        error: 1.0
+
+
   - platform: scd4x
     address: 0x62
     automatic_self_calibration: true
@@ -79,6 +91,9 @@ sensor:
     store_baseline: true
     address: 0x69
     update_interval: 10s
+    temperature:
+      id: "sen55_temperature"
+      accuracy_decimals: 1
     pm_1_0:
       name: "PM <1µm Weight concentration"
       id: "sen55_pm1_0"

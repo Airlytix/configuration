@@ -38,7 +38,7 @@ light:
 
   - platform: rgb
     id: indicator_light_internal
-    name: "Indicator_light"
+    name: "Indicator Light"
     red: indicator_led_r
     green: indicator_led_g
     blue: indicator_led_b
