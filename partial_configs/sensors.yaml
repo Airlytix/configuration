@@ -93,6 +93,7 @@ sensor:
     update_interval: 10s
     temperature:
       id: "sen55_temperature"
+      name: "SEN55 temperature"
       accuracy_decimals: 1
     pm_1_0:
       name: "PM <1µm Weight concentration"
