@@ -105,8 +105,6 @@ sensor:
       id: "sen55_temperature"
       name: "SEN55 temperature"
       accuracy_decimals: 1
-      filters: 
-        - offset: ${sen55_temperature_offset}
     humidity:
       id: "sen55_humidity"
       name: "SEN55 humidity"
