@@ -9,6 +9,19 @@ sensor:
         error: 1.0
       - source: sen55_temperature
         error: 1.0
+    filters: 
+      - lambda: "return x + id(temperature_offset_ui).state;"
+    on_value: 
+      then:
+        - lambda: |-
+            if (x >= id(temperature_good_min).state && x <= id(temperature_good_max).state) {
+              id(temperature_state).publish_state("good");
+            } else if (x >= id(temperature_fair_min).state && x <= id(temperature_fair_max).state) {
+              id(temperature_state).publish_state("fair");
+            } else {
+              id(temperature_state).publish_state("poor");
+            }
+        - component.update: state
 
   - platform: kalman_combinator
     name: "Humidity Combined"
@@ -19,6 +32,19 @@ sensor:
         error: 1.0
       - source: sen55_humidity
         error: 1.0
+    filters: 
+      - lambda: "return x + id(humidity_offset_ui).state;"
+    on_value: 
+      then:
+        - lambda: |-
+            if (x >= id(humidity_good_min).state && x <= id(humidity_good_max).state) {
+              id(humidity_state).publish_state("good");
+            } else if (x >= id(humidity_fair_min).state && x <= id(humidity_fair_max).state) {
+              id(humidity_state).publish_state("fair");
+            } else {
+              id(humidity_state).publish_state("poor");
+            }
+        - component.update: state
 
 
   - platform: scd4x
@@ -53,37 +79,11 @@ sensor:
       name: "Temperature"
       filters: 
         - offset: ${sht4x_temperature_offset}
-        - lambda: "return x + id(temperature_offset_ui).state;"
-      on_value: 
-        then:
-          - lambda: |-
-              if (x >= id(temperature_good_min).state && x <= id(temperature_good_max).state) {
-                id(temperature_state).publish_state("good");
-              } else if (x >= id(temperature_fair_min).state && x <= id(temperature_fair_max).state) {
-                id(temperature_state).publish_state("fair");
-              } else {
-                id(temperature_state).publish_state("poor");
-              }
-          - component.update: state
-
     humidity:
       id: sht4x_humidity
       name: "Humidity"
       filters: 
         - offset: ${sht4x_humidity_offset}
-        - lambda: "return x + id(humidity_offset_ui).state;"
-      on_value: 
-        then:
-          - lambda: |-
-              if (x >= id(humidity_good_min).state && x <= id(humidity_good_max).state) {
-                id(humidity_state).publish_state("good");
-              } else if (x >= id(humidity_fair_min).state && x <= id(humidity_fair_max).state) {
-                id(humidity_state).publish_state("fair");
-              } else {
-                id(humidity_state).publish_state("poor");
-              }
-          - component.update: state
-
 
   - platform: dps310
     address: 0x77
@@ -105,10 +105,14 @@ sensor:
       id: "sen55_temperature"
       name: "SEN55 temperature"
       accuracy_decimals: 1
+      filters: 
+        - offset: ${sen55_temperature_offset}
     humidity:
       id: "sen55_humidity"
       name: "SEN55 humidity"
       accuracy_decimals: 1
+      filters: 
+        - offset: ${sen55_humidity_offset}
     pm_1_0:
       name: "PM <1µm Weight concentration"
       id: "sen55_pm1_0"
@@ -212,7 +216,7 @@ sensor:
               }
           - component.update: state
     temperature_compensation:
-      offset: 0
+      offset: ${sen55_temperature_offset}
       normalized_offset_slope: 0
       time_constant: 0
 
