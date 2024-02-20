@@ -76,12 +76,12 @@ sensor:
     heater_max_duty: 0.0
     temperature:
       id: sht4x_temperature
-      name: "Temperature"
+      internal: true
       filters: 
         - offset: ${sht4x_temperature_offset}
     humidity:
       id: sht4x_humidity
-      name: "Humidity"
+      internal: true
       filters: 
         - offset: ${sht4x_humidity_offset}
 
@@ -103,13 +103,14 @@ sensor:
     update_interval: 10s
     temperature:
       id: "sen55_temperature"
-      name: "SEN55 temperature"
       accuracy_decimals: 1
+      internal: true
+      filters:
         - offset: ${sen55_temperature_offset}
     humidity:
       id: "sen55_humidity"
-      name: "SEN55 humidity"
       accuracy_decimals: 1
+      internal: true
       filters: 
         - offset: ${sen55_humidity_offset}
     pm_1_0:
