@@ -1,7 +1,7 @@
 sensor:
 
   - platform: kalman_combinator
-    name: "Temperature Combined"
+    name: "Temperature"
     unit_of_measurement: °C
     process_std_dev: 0.001
     sources:
@@ -24,7 +24,7 @@ sensor:
         - component.update: state
 
   - platform: kalman_combinator
-    name: "Humidity Combined"
+    name: "Humidity"
     unit_of_measurement: "%"
     process_std_dev: 0.001
     sources:
