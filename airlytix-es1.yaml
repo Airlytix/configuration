@@ -31,7 +31,7 @@ api:
 ota:
 
 dashboard_import:
-  package_import_url: github://airlytix/configuration/airlytix-es1-rev1.0.yaml@main
+  package_import_url: github://airlytix/configuration/airlytix-es1.yaml@main
   import_full_config: false
 
 external_components:
