@@ -1,6 +1,7 @@
 sensor:
 
-  - platform: kalman_combinator
+  - platform: combination
+    type: kalman
     name: "Temperature"
     unit_of_measurement: °C
     process_std_dev: 0.001
@@ -23,7 +24,8 @@ sensor:
             }
         - component.update: state
 
-  - platform: kalman_combinator
+  - platform: combination
+    type: kalman
     name: "Humidity"
     unit_of_measurement: "%"
     process_std_dev: 0.001
