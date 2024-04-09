@@ -1319,7 +1319,6 @@ logger:
   logs: {}
 api:
   port: 6053
-  password: \033[5m''\033[6m
   reboot_timeout: 15min
 ota:
   safe_mode: true
