@@ -19,6 +19,8 @@ jobs:
     
     generate-config:
         needs: [list-configs]
+        permissions:
+            contents: write
         strategy:
             matrix:
                 config_file: ${{ fromJson(needs.list-configs.outputs.names) }}
@@ -38,6 +40,6 @@ jobs:
             - name: Commit & Push changes
               uses: EndBug/add-and-commit@v9
               with:
-                add: ./${{ matrix.config_file }}.yaml
+                add: "./${{ matrix.config_file }}.yaml --force"
                 message: "[AUTO] Update ESPHome configuration for ${{ matrix.config_file }}"
                 push: true
