@@ -27,10 +27,17 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v2
 
-            - name: Run the build process with Docker
+            - name: Generate ESPHome configuration
               uses: addnab/docker-run-action@v3
               with:
                   image: ghcr.io/esphome/esphome:2024.3.0
                   options: -v ${{ github.workspace }}:/data
                   run: |
                       esphome config /data/configs/${{ matrix.config_file }}.yaml > /data/${{ matrix.config_file }}.yaml
+
+            - name: Commit & Push changes
+              uses: actions-js/push@master
+              with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                message: "[AUTO] Update ESPHome configuration for ${{ matrix.config_file }}"
+                branch: ${{ github.ref }}
