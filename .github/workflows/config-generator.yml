@@ -27,6 +27,10 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v2
 
-            - name: Generate ESPHome configuration
-              run: |
-                  docker run --rm -v $PWD:/data ghcr.io/esphome/esphome:2024.3.0 config /data/configs/${{ matrix.config_file }}.yaml > /data/${{ matrix.config_file }}.yaml
+            - name: Run the build process with Docker
+              uses: addnab/docker-run-action@v3
+              with:
+                  image: ghcr.io/esphome/esphome:2024.3.0
+                  options: -v ${{ github.workspace }}:/data
+                  run: |
+                      esphome config /data/configs/${{ matrix.config_file }}.yaml > /data/${{ matrix.config_file }}.yaml
