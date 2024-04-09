@@ -1,0 +1,32 @@
+name: Generate ESPHome configuration
+
+on:
+  push:
+
+  workflow_dispatch:
+
+
+jobs:
+    list-configs:
+        runs-on: ubuntu-latest
+        outputs:
+          names: ${{ steps.set-matrix.outputs.names }}
+        steps:
+          - uses: actions/checkout@v4.1.1
+          - id: set-matrix
+            run: |
+              echo "names=$(ls configs/*.yaml | xargs -I{} basename {} | sed 's/\.[^.]*$//' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+    
+    generate-config:
+        needs: [list-configs]
+        strategy:
+            matrix:
+                config_file: ${{ fromJson(needs.list-configs.outputs.names) }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Generate ESPHome configuration
+              run: |
+                  docker run --rm -v $PWD:/data ghcr.io/esphome/esphome:2024.3.0 config /data/configs/${{ matrix.config_file }}.yaml > /data/${{ matrix.config_file }}.yaml
