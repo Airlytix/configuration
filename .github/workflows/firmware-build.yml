@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4.1.1
       - id: set-matrix
         run: |
-          echo "names=$(ls *.yaml | xargs -I{} basename {} | sed 's/\.[^.]*$//' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+          echo "names=$(ls configs/*.yaml | xargs -I{} basename {} | sed 's/\.[^.]*$//' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
 
   build:
     name: Build ESPHome binary for ${{ matrix.config_file }}
