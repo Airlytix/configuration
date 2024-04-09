@@ -48,6 +48,8 @@ jobs:
       - name: Fix "never" update interval
         run: |
           sed -i 's/update_interval: 4294967295/update_interval: never/g' ${{ matrix.config_file }}.yaml
+          sed -i 's/altitude_compensation: 0/altitude_compensation: 0m/g' ${{ matrix.config_file }}.yaml
+          sed -i 's/authorizer: null/authorizer: none/g' ${{ matrix.config_file }}.yaml
 
       - name: esphome build
         id: esphome-build
