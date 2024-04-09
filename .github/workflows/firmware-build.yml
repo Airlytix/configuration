@@ -3,7 +3,6 @@ name: Build and Publish ESPHome firmware
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -11,7 +10,7 @@ on:
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
+  group: "firmware-build"
   cancel-in-progress: false
 
 jobs:
@@ -25,9 +24,42 @@ jobs:
         run: |
           echo "names=$(ls *.yaml | xargs -I{} basename {} | sed 's/\.[^.]*$//' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
 
+  generate-config:
+    needs: [list-configs]
+    permissions:
+        contents: write
+    strategy:
+        matrix:
+            config_file: ${{ fromJson(needs.list-configs.outputs.names) }}
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout repository
+          uses: actions/checkout@v2
+
+        - name: Generate ESPHome configuration
+          uses: addnab/docker-run-action@v3
+          with:
+              image: ghcr.io/esphome/esphome:2024.3.0
+              options: -v ${{ github.workspace }}:/data
+              run: |
+                  esphome config /data/configs/${{ matrix.config_file }}.yaml > /data/${{ matrix.config_file }}.yaml
+
+        
+        - name: Fix "never" update interval
+          run: |
+            sed -i 's/update_interval: 4294967295/update_interval: never/g' ${{ matrix.config_file }}.yaml
+
+        - name: Commit & Push changes
+          uses: EndBug/add-and-commit@v9
+          if: github.event_name != 'pull_request'
+          with:
+            add: "./${{ matrix.config_file }}.yaml --force"
+            message: "[AUTO] Update ESPHome configuration for ${{ matrix.config_file }}"
+            push: true
+
   build:
     name: Build ESPHome binary for ${{ matrix.config_file }}
-    needs: [list-configs]
+    needs: [list-configs, generate-config]
     strategy:
         matrix:
             config_file: ${{ fromJson(needs.list-configs.outputs.names) }}
@@ -52,6 +84,7 @@ jobs:
 
   publish:
     name: Publish new firmware to GitHub Pages
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     needs: [build]
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
