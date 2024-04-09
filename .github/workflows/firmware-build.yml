@@ -50,6 +50,7 @@ jobs:
           sed -i 's/update_interval: 4294967295/update_interval: never/g' ${{ matrix.config_file }}.yaml
           sed -i 's/altitude_compensation: 0/altitude_compensation: 0m/g' ${{ matrix.config_file }}.yaml
           sed -i 's/authorizer: null/authorizer: none/g' ${{ matrix.config_file }}.yaml
+          sed -i '1s/^/# THIS IS A GENERATED FILE. DO NOT MAKE CHANGES TO THIS FILE DIRECTLY\n/' ${{ matrix.config_file }}.yaml
 
       - name: esphome build
         id: esphome-build
