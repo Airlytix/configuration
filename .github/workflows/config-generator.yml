@@ -36,8 +36,8 @@ jobs:
                       esphome config /data/configs/${{ matrix.config_file }}.yaml > /data/${{ matrix.config_file }}.yaml
 
             - name: Commit & Push changes
-              uses: actions-js/push@master
+              uses: EndBug/add-and-commit@v9
               with:
-                github_token: ${{ secrets.GITHUB_TOKEN }}
+                add: ./${{ matrix.config_file }}.yaml
                 message: "[AUTO] Update ESPHome configuration for ${{ matrix.config_file }}"
-                branch: ${{ github.ref }}
+                push: true
