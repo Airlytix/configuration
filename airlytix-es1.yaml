@@ -300,7 +300,7 @@ sensor:
     accuracy_decimals: 0
     device_class: carbon_dioxide
     state_class: measurement
-  altitude_compensation: 0
+  altitude_compensation: 0m
   temperature_offset: 4.0
 - platform: sht4x
   id: sht4x_sensor
@@ -636,7 +636,7 @@ number:
   max_value: 20.0
   step: 0.1
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   optimistic: true
   restore_value: true
   initial_value: 0.0
@@ -655,7 +655,7 @@ number:
   max_value: 50.0
   step: 0.1
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   optimistic: true
   restore_value: true
   initial_value: 0.0
@@ -674,7 +674,7 @@ number:
   max_value: 50.0
   step: 1.0
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   optimistic: true
   restore_value: true
   initial_value: 0.0
@@ -698,7 +698,7 @@ number:
   restore_value: true
   unit_of_measurement: °C
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: temperature_good_max
@@ -713,7 +713,7 @@ number:
   restore_value: true
   unit_of_measurement: °C
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: temperature_fair_min
@@ -728,7 +728,7 @@ number:
   restore_value: true
   unit_of_measurement: °C
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: temperature_fair_max
@@ -743,7 +743,7 @@ number:
   restore_value: true
   unit_of_measurement: °C
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: humidity_good_min
@@ -758,7 +758,7 @@ number:
   restore_value: true
   unit_of_measurement: '%'
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: humidity_good_max
@@ -773,7 +773,7 @@ number:
   restore_value: true
   unit_of_measurement: '%'
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: humidity_fair_min
@@ -788,7 +788,7 @@ number:
   restore_value: true
   unit_of_measurement: '%'
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: humidity_fair_max
@@ -803,7 +803,7 @@ number:
   restore_value: true
   unit_of_measurement: '%'
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: co2_good_min
@@ -818,7 +818,7 @@ number:
   restore_value: true
   unit_of_measurement: ppm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: co2_good_max
@@ -833,7 +833,7 @@ number:
   restore_value: true
   unit_of_measurement: ppm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: co2_fair_min
@@ -848,7 +848,7 @@ number:
   restore_value: true
   unit_of_measurement: ppm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: co2_fair_max
@@ -863,7 +863,7 @@ number:
   restore_value: true
   unit_of_measurement: ppm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm1_0_good_min
@@ -878,7 +878,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm1_0_good_max
@@ -893,7 +893,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm1_0_fair_min
@@ -908,7 +908,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm1_0_fair_max
@@ -923,7 +923,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm2_5_good_min
@@ -938,7 +938,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm2_5_good_max
@@ -953,7 +953,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm2_5_fair_min
@@ -968,7 +968,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm2_5_fair_max
@@ -983,7 +983,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm4_0_good_min
@@ -998,7 +998,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm4_0_good_max
@@ -1013,7 +1013,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm4_0_fair_min
@@ -1028,7 +1028,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm4_0_fair_max
@@ -1043,7 +1043,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm10_0_good_min
@@ -1058,7 +1058,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm10_0_good_max
@@ -1073,7 +1073,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm10_0_fair_min
@@ -1088,7 +1088,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm10_0_fair_max
@@ -1103,7 +1103,7 @@ number:
   restore_value: true
   unit_of_measurement: µm
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: voc_good_min
@@ -1117,7 +1117,7 @@ number:
   step: 0.1
   restore_value: true
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: voc_good_max
@@ -1131,7 +1131,7 @@ number:
   step: 0.1
   restore_value: true
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: voc_fair_min
@@ -1145,7 +1145,7 @@ number:
   step: 0.1
   restore_value: true
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: voc_fair_max
@@ -1159,7 +1159,7 @@ number:
   step: 0.1
   restore_value: true
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: nox_good_min
@@ -1173,7 +1173,7 @@ number:
   step: 0.1
   restore_value: true
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: nox_good_max
@@ -1187,7 +1187,7 @@ number:
   step: 0.1
   restore_value: true
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: nox_fair_min
@@ -1201,7 +1201,7 @@ number:
   step: 0.1
   restore_value: true
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: nox_fair_max
@@ -1215,13 +1215,13 @@ number:
   step: 0.1
   restore_value: true
   mode: BOX
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 text_sensor:
 - platform: template
   id: state
   name: State
-  update_interval: 4294967295
+  update_interval: never
   lambda: !lambda "auto states = {\n  id(temperature_state).state,\n  id(humidity_state).state,\n\
     \  id(co2_state).state,\n  id(pm1_0_state).state,\n  id(pm2_5_state).state,\n\
     \  id(pm4_0_state).state,\n  id(pm10_0_state).state,\n  id(voc_state).state,\n\
@@ -1267,47 +1267,47 @@ text_sensor:
 - platform: template
   id: temperature_state
   name: Temperature State
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: humidity_state
   name: Humidity State
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: co2_state
   name: CO2 State
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm1_0_state
   name: PM <1µm State
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm2_5_state
   name: PM <2.5µm State
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm4_0_state
   name: PM <4µm State
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: pm10_0_state
   name: PM <10µm State
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: voc_state
   name: VOC State
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 - platform: template
   id: nox_state
   name: NOX State
-  update_interval: 4294967295
+  update_interval: never
   disabled_by_default: false
 logger:
   baud_rate: 115200
@@ -1356,7 +1356,7 @@ wifi:
   use_address: airlytix-es1.local
 captive_portal: {}
 esp32_improv:
-  authorizer: null
+  authorizer: none
   identify_duration: 10s
   authorized_duration: 1min
   wifi_timeout: 1min
