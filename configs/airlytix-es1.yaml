@@ -48,13 +48,13 @@ esp32_improv:
 
 improv_serial:
 
-<<: !include hardware/es1/rev1.0.yaml
+<<: !include ../hardware/es1/rev1.0.yaml
 
 packages:
-  indicator_led: !include partial_configs/indicator_led.yaml
-  diagnostics: !include partial_configs/diagnostics.yaml
-  sensors: !include partial_configs/sensors.yaml
-  state: !include partial_configs/state.yaml
+  indicator_led: !include ../partial_configs/indicator_led.yaml
+  diagnostics: !include ../partial_configs/diagnostics.yaml
+  sensors: !include ../partial_configs/sensors.yaml
+  state: !include ../partial_configs/state.yaml
 
 interval:
   - interval: 1s
