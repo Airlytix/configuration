@@ -6,7 +6,7 @@ substitutions:
   indicator_max_power: '1'
   sht4x_temperature_offset: '-6.5'
   sht4x_humidity_offset: '20'
-  sen55_temperature_offset: '-4.5'
+  sen55_temperature_offset: '-1.5'
   sen55_humidity_offset: '0'
   veml6040_glass_attenuation: '0.42'
 esphome:
@@ -370,7 +370,7 @@ sensor:
     accuracy_decimals: 1
     internal: true
     filters:
-    - offset: -4.5
+    - offset: -1.5
     disabled_by_default: false
     force_update: false
     unit_of_measurement: °C
@@ -535,7 +535,7 @@ sensor:
     device_class: aqi
     state_class: measurement
   temperature_compensation:
-    offset: -4.5
+    offset: -1.5
     normalized_offset_slope: 0.0
     time_constant: 0
 - platform: veml6040
