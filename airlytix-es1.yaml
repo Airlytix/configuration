@@ -17,6 +17,19 @@ esphome:
   project:
     name: ${project_name}
     version: ${project_version}
+  on_boot: 
+    then:
+      - if: 
+          condition:
+            - light.is_on: indicator_light
+          then:
+            - light.turn_on:
+                id: indicator_light_internal
+                brightness: !lambda return id(indicator_light).remote_values.get_brightness();
+                blue: 1
+                red: 0
+                green: 0
+                effect: Pulse
 
 esp32:
   board: esp32dev
@@ -71,24 +84,6 @@ interval:
           - output.turn_off: status_led_2
           - delay: 200ms
 
-# Indicator LED Configuration
-
-esphome:
-  on_boot: 
-    then:
-      - if: 
-          condition:
-            - light.is_on: indicator_light
-          then:
-            - light.turn_on:
-                id: indicator_light_internal
-                brightness: !lambda return id(indicator_light).remote_values.get_brightness();
-                blue: 1
-                red: 0
-                green: 0
-                effect: Pulse
-
-
 light:
   - platform: monochromatic
     id: indicator_light
@@ -134,10 +129,30 @@ output:
       - lambda: ''
 
 
-# Sensors Configuration
+  - platform: gpio
+    id: status_led_2
+    pin: GPIO13
+  - platform: ledc
+    id: indicator_led_r
+    pin: GPIO25
+    inverted: True
+    min_power: 0
+    max_power: ${indicator_max_power}
+  - platform: ledc
+    id: indicator_led_g
+    pin: GPIO26
+    inverted: True
+    min_power: 0
+    max_power: ${indicator_max_power}
+  - platform: ledc
+    id: indicator_led_b
+    pin: GPIO33 
+    inverted: True
+    min_power: 0
+    max_power: ${indicator_max_power}
+
 
 sensor:
-
   - platform: combination
     type: kalman
     name: "Temperature"
@@ -373,6 +388,26 @@ sensor:
         - lambda: "return x + id(illuminance_offset_ui).state;"
 
 
+  - platform: uptime
+    name: "Uptime"
+    update_interval: 60s
+    entity_category: "diagnostic"
+
+  - platform: wifi_signal
+    name: "WiFi Signal dB"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: "diagnostic"
+
+  - platform: copy
+    source_id: wifi_signal_db
+    name: "WiFi Signal Percent"
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: "diagnostic"
+
+
 sound_level_meter:
   update_interval: 60s
   is_on: true
@@ -462,107 +497,7 @@ number:
     on_value:
       - component.update: veml6040_sensor
 
-# State Configuration
 
-text_sensor:
-  - platform: template
-    id: "state"
-    name: "State"
-    update_interval: never
-
-    lambda: |-
-      auto states = {
-        id(temperature_state).state,
-        id(humidity_state).state,
-        id(co2_state).state,
-        id(pm1_0_state).state,
-        id(pm2_5_state).state,
-        id(pm4_0_state).state,
-        id(pm10_0_state).state,
-        id(voc_state).state,
-        id(nox_state).state,
-      };
-
-      auto *poor = std::find(std::begin(states), std::end(states), "poor");
-      if (poor != std::end(states)) {
-        return {"poor"};  
-      }
-
-      auto *fair = std::find(std::begin(states), std::end(states), "fair");
-      if (fair != std::end(states)) {
-        return {"fair"};  
-      }
-
-      return {"good"};
-    on_value: 
-      then:
-        - if: 
-            condition: 
-              - lambda: return x == "good";
-            then:
-              - light.control: 
-                  id: indicator_light_internal
-                  blue: 0
-                  green: 1
-                  red: 0
-                  effect: "None"
-            else:
-              if:
-                condition:                  
-                  - lambda: return x == "fair";
-                then:
-                  - light.control: 
-                      id: indicator_light_internal
-                      blue: 0
-                      green: 0.647
-                      red: 1
-                      effect: "None"
-                else:
-                  - light.control: 
-                      id: indicator_light_internal
-                      blue: 0
-                      green: 0
-                      red: 1
-                      effect: "None"
-
-  - platform: template
-    id: "temperature_state"
-    name: "Temperature State"
-    update_interval: never
-  - platform: template
-    id: "humidity_state"
-    name: "Humidity State"
-    update_interval: never
-  - platform: template
-    id: "co2_state"
-    name: "CO2 State"
-    update_interval: never
-  - platform: template
-    id: "pm1_0_state"
-    name: "PM <1µm State"
-    update_interval: never
-  - platform: template
-    id: "pm2_5_state"
-    name: "PM <2.5µm State"
-    update_interval: never
-  - platform: template
-    id: "pm4_0_state"
-    name: "PM <4µm State"
-    update_interval: never
-  - platform: template
-    id: "pm10_0_state"
-    name: "PM <10µm State"
-    update_interval: never
-  - platform: template
-    id: "voc_state"
-    name: "VOC State"
-    update_interval: never
-  - platform: template
-    id: "nox_state"
-    name: "NOX State"
-    update_interval: never
-
-number:
   - platform: template
     id: temperature_good_min
     name: Temperature Good Min
@@ -1111,54 +1046,103 @@ number:
     mode: box
     update_interval: never
 
+text_sensor:
+  - platform: template
+    id: "state"
+    name: "State"
+    update_interval: never
 
-# Diagnostic Configuration
+    lambda: |-
+      auto states = {
+        id(temperature_state).state,
+        id(humidity_state).state,
+        id(co2_state).state,
+        id(pm1_0_state).state,
+        id(pm2_5_state).state,
+        id(pm4_0_state).state,
+        id(pm10_0_state).state,
+        id(voc_state).state,
+        id(nox_state).state,
+      };
 
-sensor:
-  - platform: uptime
-    name: "Uptime"
-    update_interval: 60s
-    entity_category: "diagnostic"
+      auto *poor = std::find(std::begin(states), std::end(states), "poor");
+      if (poor != std::end(states)) {
+        return {"poor"};  
+      }
 
-  - platform: wifi_signal
-    name: "WiFi Signal dB"
-    id: wifi_signal_db
-    update_interval: 60s
-    entity_category: "diagnostic"
+      auto *fair = std::find(std::begin(states), std::end(states), "fair");
+      if (fair != std::end(states)) {
+        return {"fair"};  
+      }
 
-  - platform: copy
-    source_id: wifi_signal_db
-    name: "WiFi Signal Percent"
-    filters:
-      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
-    unit_of_measurement: "%"
-    entity_category: "diagnostic"
+      return {"good"};
+    on_value: 
+      then:
+        - if: 
+            condition: 
+              - lambda: return x == "good";
+            then:
+              - light.control: 
+                  id: indicator_light_internal
+                  blue: 0
+                  green: 1
+                  red: 0
+                  effect: "None"
+            else:
+              if:
+                condition:                  
+                  - lambda: return x == "fair";
+                then:
+                  - light.control: 
+                      id: indicator_light_internal
+                      blue: 0
+                      green: 0.647
+                      red: 1
+                      effect: "None"
+                else:
+                  - light.control: 
+                      id: indicator_light_internal
+                      blue: 0
+                      green: 0
+                      red: 1
+                      effect: "None"
 
-
-# Board Rev 1.0 Configuration
-output:
-  - platform: gpio
-    id: status_led_2
-    pin: GPIO13
-  - platform: ledc
-    id: indicator_led_r
-    pin: GPIO25
-    inverted: True
-    min_power: 0
-    max_power: ${indicator_max_power}
-  - platform: ledc
-    id: indicator_led_g
-    pin: GPIO26
-    inverted: True
-    min_power: 0
-    max_power: ${indicator_max_power}
-  - platform: ledc
-    id: indicator_led_b
-    pin: GPIO33 
-    inverted: True
-    min_power: 0
-    max_power: ${indicator_max_power}
-
+  - platform: template
+    id: "temperature_state"
+    name: "Temperature State"
+    update_interval: never
+  - platform: template
+    id: "humidity_state"
+    name: "Humidity State"
+    update_interval: never
+  - platform: template
+    id: "co2_state"
+    name: "CO2 State"
+    update_interval: never
+  - platform: template
+    id: "pm1_0_state"
+    name: "PM <1µm State"
+    update_interval: never
+  - platform: template
+    id: "pm2_5_state"
+    name: "PM <2.5µm State"
+    update_interval: never
+  - platform: template
+    id: "pm4_0_state"
+    name: "PM <4µm State"
+    update_interval: never
+  - platform: template
+    id: "pm10_0_state"
+    name: "PM <10µm State"
+    update_interval: never
+  - platform: template
+    id: "voc_state"
+    name: "VOC State"
+    update_interval: never
+  - platform: template
+    id: "nox_state"
+    name: "NOX State"
+    update_interval: never
 
 status_led:
   pin: GPIO32
