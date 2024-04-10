@@ -1,1452 +1,1165 @@
-# THIS IS A GENERATED FILE. DO NOT MAKE CHANGES TO THIS FILE DIRECTLY
 substitutions:
-  name: airlytix-es1
-  friendly_name: Airlytix
-  project_name: airlytix.es1
-  project_version: 1.0.0
-  indicator_max_power: '1'
-  sht4x_temperature_offset: '-6.5'
-  sht4x_humidity_offset: '20'
-  sen55_temperature_offset: '-1.5'
-  sen55_humidity_offset: '0'
-  veml6040_glass_attenuation: '0.42'
+  name: "airlytix-es1"
+  friendly_name: "Airlytix"
+  project_name: "airlytix.es1"
+  project_version: "1.0.0"
+  indicator_max_power: "1"
+  sht4x_temperature_offset: "-6.5"
+  sht4x_humidity_offset: "20"
+  sen55_temperature_offset: "-1.5"
+  sen55_humidity_offset: "0"
+  veml6040_glass_attenuation: "0.42"
+
 esphome:
-  on_boot:
-  - then:
-    - if:
-        condition:
-          and:
-          - light.is_on:
-              id: indicator_light
-        then:
-        - light.turn_on:
-            id: indicator_light_internal
-            brightness: !lambda |-
-              return id(indicator_light).remote_values.get_brightness();
-            blue: 1.0
-            red: 0.0
-            green: 0.0
-            effect: Pulse
-            state: true
-    priority: 600.0
-  name: airlytix-es1
-  friendly_name: Airlytix
+  name: ${name}
+  friendly_name: ${friendly_name}
   name_add_mac_suffix: true
   project:
-    name: airlytix.es1
-    version: 1.0.0
-  build_path: build/airlytix-es1
-  area: ''
-  platformio_options: {}
-  includes: []
-  libraries: []
-  min_version: 2024.3.0
+    name: ${project_name}
+    version: ${project_version}
+  on_boot: 
+    then:
+      - if: 
+          condition:
+            - light.is_on: indicator_light
+          then:
+            - light.turn_on:
+                id: indicator_light_internal
+                brightness: !lambda return id(indicator_light).remote_values.get_brightness();
+                blue: 1
+                red: 0
+                green: 0
+                effect: Pulse
+
 esp32:
   board: esp32dev
   framework:
-    version: 4.4.6
-    sdkconfig_options: {}
-    advanced:
-      ignore_efuse_mac_crc: false
-    components: []
-    source: ~3.40406.0
-    platform_version: platformio/espressif32@5.4.0
     type: esp-idf
-  flash_size: 4MB
-  variant: ESP32
-light:
-- platform: monochromatic
-  id: indicator_light
-  name: Indicator Light
-  output: dummy_output
-  default_transition_length: 0s
-  restore_mode: RESTORE_AND_ON
-  on_turn_on:
-  - then:
-    - light.turn_on:
-        id: indicator_light_internal
-        transition_length: 0s
-        brightness: !lambda |-
-          return id(indicator_light).remote_values.get_brightness();
-        state: true
-  on_turn_off:
-  - then:
-    - light.turn_off:
-        id: indicator_light_internal
-        state: false
-  on_state:
-  - then:
-    - light.control:
-        id: indicator_light_internal
-        brightness: !lambda |-
-          return id(indicator_light).remote_values.get_brightness();
-  disabled_by_default: false
-  gamma_correct: 2.8
-  flash_transition_length: 0s
-- platform: rgb
-  id: indicator_light_internal
-  name: Indicator Light
-  red: indicator_led_r
-  green: indicator_led_g
-  blue: indicator_led_b
-  internal: true
-  effects:
-  - pulse:
-      transition_length: 500ms
-      update_interval: 500ms
-      min_brightness: 0.0
-      max_brightness: 1.0
-      name: Pulse
-  disabled_by_default: false
-  restore_mode: ALWAYS_OFF
-  gamma_correct: 2.8
-  default_transition_length: 1s
-  flash_transition_length: 0s
-output:
-- platform: template
-  id: dummy_output
-  write_action:
+    version: recommended
+
+logger:
+
+api:
+
+ota:
+
+dashboard_import:
+  package_import_url: github://airlytix/configuration/airlytix-es1.yaml@main
+  import_full_config: false
+
+external_components:
+  - source: github://airlytix/esphome-sound-level-meter@main
+  - source: github://airlytix/configuration@main
+
+wifi:
+  ap:
+
+captive_portal:
+
+esp32_improv:
+  authorizer: none
+
+improv_serial:
+
+interval:
+  - interval: 1s
     then:
-    - lambda: !lambda ""
-  zero_means_zero: false
-  type: float
-- platform: gpio
-  id: status_led_2
-  pin:
-    number: 13
-    mode:
-      output: true
-      input: false
-      open_drain: false
-      pullup: false
-      pulldown: false
-    inverted: false
-    ignore_strapping_warning: false
-    drive_strength: 20.0
-- platform: ledc
-  id: indicator_led_r
-  pin:
-    number: 25
-    mode:
-      output: true
-      input: false
-      open_drain: false
-      pullup: false
-      pulldown: false
-    inverted: false
-    ignore_strapping_warning: false
-    drive_strength: 20.0
-  inverted: true
-  min_power: 0.0
-  max_power: 1.0
-  zero_means_zero: false
-  frequency: 1000.0
-- platform: ledc
-  id: indicator_led_g
-  pin:
-    number: 26
-    mode:
-      output: true
-      input: false
-      open_drain: false
-      pullup: false
-      pulldown: false
-    inverted: false
-    ignore_strapping_warning: false
-    drive_strength: 20.0
-  inverted: true
-  min_power: 0.0
-  max_power: 1.0
-  zero_means_zero: false
-  frequency: 1000.0
-- platform: ledc
-  id: indicator_led_b
-  pin:
-    number: 33
-    mode:
-      output: true
-      input: false
-      open_drain: false
-      pullup: false
-      pulldown: false
-    inverted: false
-    ignore_strapping_warning: false
-    drive_strength: 20.0
-  inverted: true
-  min_power: 0.0
-  max_power: 1.0
-  zero_means_zero: false
-  frequency: 1000.0
+      if:
+        condition:
+          wifi.connected:
+        then:
+          - if:
+              condition:
+                api.connected:
+              then:
+                - output.turn_off: status_led_2
+              else:
+                - output.turn_on: status_led_2
+                - delay: 500ms
+                - output.turn_off: status_led_2
+                - delay: 500ms
+        else:
+          - output.turn_on: status_led_2
+          - delay: 200ms
+          - output.turn_off: status_led_2
+          - delay: 200ms
+
+light:
+  - platform: monochromatic
+    id: indicator_light
+    name: "Indicator Light"
+    output: dummy_output
+    default_transition_length: 0s
+    restore_mode: RESTORE_AND_ON
+    on_turn_on: 
+      then:
+        - light.turn_on: 
+            id: indicator_light_internal
+            transition_length: 0s
+            brightness: !lambda return id(indicator_light).remote_values.get_brightness();
+    on_turn_off: 
+      then:
+        - light.turn_off: indicator_light_internal        
+    on_state:
+      then:
+        - light.control: 
+            id: indicator_light_internal
+            brightness: !lambda return id(indicator_light).remote_values.get_brightness();
+
+  - platform: rgb
+    id: indicator_light_internal
+    name: "Indicator Light"
+    red: indicator_led_r
+    green: indicator_led_g
+    blue: indicator_led_b
+    internal: true
+    effects:
+      - pulse:
+          transition_length: 0.5s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 100%
+
+
+output:
+  - platform: template
+    id: dummy_output
+    type: float
+    write_action:
+      - lambda: ''
+
+
+  - platform: gpio
+    id: status_led_2
+    pin: GPIO13
+  - platform: ledc
+    id: indicator_led_r
+    pin: GPIO25
+    inverted: True
+    min_power: 0
+    max_power: ${indicator_max_power}
+  - platform: ledc
+    id: indicator_led_g
+    pin: GPIO26
+    inverted: True
+    min_power: 0
+    max_power: ${indicator_max_power}
+  - platform: ledc
+    id: indicator_led_b
+    pin: GPIO33 
+    inverted: True
+    min_power: 0
+    max_power: ${indicator_max_power}
+
+
 sensor:
-- platform: uptime
-  name: Uptime
-  update_interval: 60s
-  entity_category: diagnostic
-  disabled_by_default: false
-  force_update: false
-  unit_of_measurement: s
-  icon: mdi:timer-outline
-  accuracy_decimals: 0
-  device_class: duration
-  state_class: total_increasing
-- platform: wifi_signal
-  name: WiFi Signal dB
-  id: wifi_signal_db
-  update_interval: 60s
-  entity_category: diagnostic
-  disabled_by_default: false
-  force_update: false
-  unit_of_measurement: dBm
-  accuracy_decimals: 0
-  device_class: signal_strength
-  state_class: measurement
-- platform: copy
-  source_id: wifi_signal_db
-  name: WiFi Signal Percent
-  filters:
-  - lambda: !lambda |-
-      return min(max(2 * (x + 100.0), 0.0), 100.0);
-  unit_of_measurement: '%'
-  entity_category: diagnostic
-  disabled_by_default: false
-  force_update: false
-  accuracy_decimals: 0
-  device_class: signal_strength
-  state_class: measurement
-- platform: combination
-  name: Temperature
-  unit_of_measurement: °C
-  process_std_dev: 0.001
-  sources:
-  - source: sht4x_temperature
-    error: 1.0
-  - source: sen55_temperature
-    error: 1.0
-  filters:
-  - lambda: !lambda |-
-      return x + id(temperature_offset_ui).state;
-  on_value:
-  - then:
-    - lambda: !lambda |-
-        if (x >= id(temperature_good_min).state && x <= id(temperature_good_max).state) {
-          id(temperature_state).publish_state("good");
-        } else if (x >= id(temperature_fair_min).state && x <= id(temperature_fair_max).state) {
-          id(temperature_state).publish_state("fair");
-        } else {
-          id(temperature_state).publish_state("poor");
-        }
-    - component.update:
-        id: state
-  disabled_by_default: false
-  force_update: false
-  type: kalman
-  accuracy_decimals: 2
-  device_class: temperature
-  icon: mdi:thermometer
-- platform: combination
-  name: Humidity
-  unit_of_measurement: '%'
-  process_std_dev: 0.001
-  sources:
-  - source: sht4x_humidity
-    error: 1.0
-  - source: sen55_humidity
-    error: 1.0
-  filters:
-  - lambda: !lambda |-
-      return x + id(humidity_offset_ui).state;
-  on_value:
-  - then:
-    - lambda: !lambda |-
-        if (x >= id(humidity_good_min).state && x <= id(humidity_good_max).state) {
-          id(humidity_state).publish_state("good");
-        } else if (x >= id(humidity_fair_min).state && x <= id(humidity_fair_max).state) {
-          id(humidity_state).publish_state("fair");
-        } else {
-          id(humidity_state).publish_state("poor");
-        }
-    - component.update:
-        id: state
-  disabled_by_default: false
-  force_update: false
-  type: kalman
-  accuracy_decimals: 2
-  device_class: humidity
-  icon: mdi:water-percent
-- platform: scd4x
-  address: 0x62
-  automatic_self_calibration: true
-  measurement_mode: low_power_periodic
-  update_interval: 30s
-  ambient_pressure_compensation_source: dps310_pressure
-  co2:
-    name: CO2
-    id: scd4x_co2
-    on_value:
-    - then:
-      - lambda: !lambda |-
-          if (x >= id(co2_good_min).state && x <= id(co2_good_max).state) {
-            id(co2_state).publish_state("good");
-          } else if (x >= id(co2_fair_min).state && x <= id(co2_fair_max).state) {
-            id(co2_state).publish_state("fair");
-          } else {
-            id(co2_state).publish_state("poor");
-          }
-      - component.update:
-          id: state
-    disabled_by_default: false
-    force_update: false
-    unit_of_measurement: ppm
-    icon: mdi:molecule-co2
-    accuracy_decimals: 0
-    device_class: carbon_dioxide
-    state_class: measurement
-  altitude_compensation: 0m
-  temperature_offset: 4.0
-- platform: sht4x
-  id: sht4x_sensor
-  address: 0x44
-  update_interval: 60s
-  precision: High
-  heater_max_duty: 0.0
-  temperature:
-    id: sht4x_temperature
-    internal: true
-    filters:
-    - offset: -6.5
-    disabled_by_default: false
-    force_update: false
+  - platform: combination
+    type: kalman
+    name: "Temperature"
     unit_of_measurement: °C
-    icon: mdi:thermometer
-    accuracy_decimals: 2
-    device_class: temperature
-    state_class: measurement
-    name: sht4x_temperature
-  humidity:
-    id: sht4x_humidity
-    internal: true
+    process_std_dev: 0.001
+    sources:
+      - source: sht4x_temperature
+        error: 1.0
+      - source: sen55_temperature
+        error: 1.0
+    filters: 
+      - lambda: "return x + id(temperature_offset_ui).state;"
+    on_value: 
+      then:
+        - lambda: |-
+            if (x >= id(temperature_good_min).state && x <= id(temperature_good_max).state) {
+              id(temperature_state).publish_state("good");
+            } else if (x >= id(temperature_fair_min).state && x <= id(temperature_fair_max).state) {
+              id(temperature_state).publish_state("fair");
+            } else {
+              id(temperature_state).publish_state("poor");
+            }
+        - component.update: state
+
+  - platform: combination
+    type: kalman
+    name: "Humidity"
+    unit_of_measurement: "%"
+    process_std_dev: 0.001
+    sources:
+      - source: sht4x_humidity
+        error: 1.0
+      - source: sen55_humidity
+        error: 1.0
+    filters: 
+      - lambda: "return x + id(humidity_offset_ui).state;"
+    on_value: 
+      then:
+        - lambda: |-
+            if (x >= id(humidity_good_min).state && x <= id(humidity_good_max).state) {
+              id(humidity_state).publish_state("good");
+            } else if (x >= id(humidity_fair_min).state && x <= id(humidity_fair_max).state) {
+              id(humidity_state).publish_state("fair");
+            } else {
+              id(humidity_state).publish_state("poor");
+            }
+        - component.update: state
+
+
+  - platform: scd4x
+    address: 0x62
+    automatic_self_calibration: true
+    measurement_mode: low_power_periodic
+    update_interval: 30s
+    ambient_pressure_compensation_source: dps310_pressure
+    co2:
+      name: "CO2"
+      id: "scd4x_co2"
+      on_value: 
+        then:
+          - lambda: |-
+              if (x >= id(co2_good_min).state && x <= id(co2_good_max).state) {
+                id(co2_state).publish_state("good");
+              } else if (x >= id(co2_fair_min).state && x <= id(co2_fair_max).state) {
+                id(co2_state).publish_state("fair");
+              } else {
+                id(co2_state).publish_state("poor");
+              }
+          - component.update: state
+
+  - platform: sht4x
+    id: sht4x_sensor
+    address: 0x44
+    update_interval: 60s
+    precision: High
+    heater_max_duty: 0.0
+    temperature:
+      id: sht4x_temperature
+      internal: true
+      filters: 
+        - offset: ${sht4x_temperature_offset}
+    humidity:
+      id: sht4x_humidity
+      internal: true
+      filters: 
+        - offset: ${sht4x_humidity_offset}
+
+  - platform: dps310
+    address: 0x77
+    update_interval: 120s
+    temperature:
+      disabled_by_default: True
+      internal: True
+      id: "dps310_temperature"
+    pressure:
+      name: "Pressure"
+      id: "dps310_pressure"
+
+  - platform: sen5x
+    acceleration_mode: low
+    store_baseline: true
+    address: 0x69
+    update_interval: 10s
+    temperature:
+      id: "sen55_temperature"
+      accuracy_decimals: 1
+      internal: true
+      filters:
+        - offset: ${sen55_temperature_offset}
+    humidity:
+      id: "sen55_humidity"
+      accuracy_decimals: 1
+      internal: true
+      filters: 
+        - offset: ${sen55_humidity_offset}
+    pm_1_0:
+      name: "PM <1µm Weight concentration"
+      id: "sen55_pm1_0"
+      accuracy_decimals: 1
+      on_value: 
+        then:
+          - lambda: |-
+              if (x >= id(pm1_0_good_min).state && x <= id(pm1_0_good_max).state) {
+                id(pm1_0_state).publish_state("good");
+              } else if (x >= id(pm1_0_fair_min).state && x <= id(pm1_0_fair_max).state) {
+                id(pm1_0_state).publish_state("fair");
+              } else {
+                id(pm1_0_state).publish_state("poor");
+              }
+          - component.update: state
+    pm_2_5:
+      name: "PM <2.5µm Weight concentration"
+      id: "sen55_pm2_5"
+      accuracy_decimals: 1
+      on_value: 
+        then:
+          - lambda: |-
+              if (x >= id(pm2_5_good_min).state && x <= id(pm2_5_good_max).state) {
+                id(pm2_5_state).publish_state("good");
+              } else if (x >= id(pm2_5_fair_min).state && x <= id(pm2_5_fair_max).state) {
+                id(pm2_5_state).publish_state("fair");
+              } else {
+                id(pm2_5_state).publish_state("poor");
+              }
+          - component.update: state
+    pm_4_0:
+      name: "PM <4µm Weight concentration"
+      id: "sen55_pm4_0"
+      accuracy_decimals: 1
+      on_value: 
+        then:
+          - lambda: |-
+              if (x >= id(pm4_0_good_min).state && x <= id(pm4_0_good_max).state) {
+                id(pm4_0_state).publish_state("good");
+              } else if (x >= id(pm4_0_fair_min).state && x <= id(pm4_0_fair_max).state) {
+                id(pm4_0_state).publish_state("fair");
+              } else {
+                id(pm4_0_state).publish_state("poor");
+              }
+          - component.update: state
+    pm_10_0:
+      name: "PM <10µm Weight concentration"
+      id: "sen55_pm10_0"
+      accuracy_decimals: 1
+      on_value: 
+        then:
+          - lambda: |-
+              if (x >= id(pm10_0_good_min).state && x <= id(pm10_0_good_max).state) {
+                id(pm10_0_state).publish_state("good");
+              } else if (x >= id(pm10_0_fair_min).state && x <= id(pm10_0_fair_max).state) {
+                id(pm10_0_state).publish_state("fair");
+              } else {
+                id(pm10_0_state).publish_state("poor");
+              }
+          - component.update: state
+    voc:
+      name: "VOC"
+      id: "sen55_voc"
+      algorithm_tuning:
+        index_offset: 100
+        learning_time_offset_hours: 12
+        learning_time_gain_hours: 12
+        gating_max_duration_minutes: 180
+        std_initial: 50
+        gain_factor: 230
+      on_value: 
+        then:
+          - lambda: |-
+              if (x >= id(voc_good_min).state && x <= id(voc_good_max).state) {
+                id(voc_state).publish_state("good");
+              } else if (x >= id(voc_fair_min).state && x <= id(voc_fair_max).state) {
+                id(voc_state).publish_state("fair");
+              } else {
+                id(voc_state).publish_state("poor");
+              }
+          - component.update: state
+    nox:
+      name: "NOX"
+      id: "sen55_nox"
+      algorithm_tuning:
+        index_offset: 1
+        learning_time_offset_hours: 12
+        learning_time_gain_hours: 12
+        gating_max_duration_minutes: 180
+        std_initial: 50
+        gain_factor: 230
+      on_value: 
+        then:
+          - lambda: |-
+              if (x >= id(nox_good_min).state && x <= id(nox_good_max).state) {
+                id(nox_state).publish_state("good");
+              } else if (x >= id(nox_fair_min).state && x <= id(nox_fair_max).state) {
+                id(nox_state).publish_state("fair");
+              } else {
+                id(nox_state).publish_state("poor");
+              }
+          - component.update: state
+    temperature_compensation:
+      offset: ${sen55_temperature_offset}
+      normalized_offset_slope: 0
+      time_constant: 0
+
+  - platform: veml6040
+    id: veml6040_sensor
+    glass_attenuation_factor: ${veml6040_glass_attenuation}
+    color_temperature:
+      name: "Ambient Light CCT"
+      id: veml6040_color_temperature
+    illuminance:
+      name: "Ambient Light"
+      id: veml6040_illuminance
+      filters:
+        - lambda: "return x + id(illuminance_offset_ui).state;"
+
+
+  - platform: uptime
+    name: "Uptime"
+    update_interval: 60s
+    entity_category: "diagnostic"
+
+  - platform: wifi_signal
+    name: "WiFi Signal dB"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: "diagnostic"
+
+  - platform: copy
+    source_id: wifi_signal_db
+    name: "WiFi Signal Percent"
     filters:
-    - offset: 20.0
-    disabled_by_default: false
-    force_update: false
-    unit_of_measurement: '%'
-    icon: mdi:water-percent
-    accuracy_decimals: 2
-    device_class: humidity
-    state_class: measurement
-    name: sht4x_humidity
-  heater_power: High
-  heater_time: Long
-- platform: dps310
-  address: 0x77
-  update_interval: 120s
-  temperature:
-    disabled_by_default: true
-    internal: true
-    id: dps310_temperature
-    force_update: false
-    unit_of_measurement: °C
-    icon: mdi:thermometer
-    accuracy_decimals: 1
-    device_class: temperature
-    state_class: measurement
-    name: dps310_temperature
-  pressure:
-    name: Pressure
-    id: dps310_pressure
-    disabled_by_default: false
-    force_update: false
-    unit_of_measurement: hPa
-    icon: mdi:gauge
-    accuracy_decimals: 1
-    device_class: pressure
-    state_class: measurement
-- platform: sen5x
-  acceleration_mode: low
-  store_baseline: true
-  address: 0x69
-  update_interval: 10s
-  temperature:
-    id: sen55_temperature
-    accuracy_decimals: 1
-    internal: true
-    filters:
-    - offset: -1.5
-    disabled_by_default: false
-    force_update: false
-    unit_of_measurement: °C
-    icon: mdi:thermometer
-    device_class: temperature
-    state_class: measurement
-    name: sen55_temperature
-  humidity:
-    id: sen55_humidity
-    accuracy_decimals: 1
-    internal: true
-    filters:
-    - offset: 0.0
-    disabled_by_default: false
-    force_update: false
-    unit_of_measurement: '%'
-    icon: mdi:water-percent
-    device_class: humidity
-    state_class: measurement
-    name: sen55_humidity
-  pm_1_0:
-    name: PM <1µm Weight concentration
-    id: sen55_pm1_0
-    accuracy_decimals: 1
-    on_value:
-    - then:
-      - lambda: !lambda |-
-          if (x >= id(pm1_0_good_min).state && x <= id(pm1_0_good_max).state) {
-            id(pm1_0_state).publish_state("good");
-          } else if (x >= id(pm1_0_fair_min).state && x <= id(pm1_0_fair_max).state) {
-            id(pm1_0_state).publish_state("fair");
-          } else {
-            id(pm1_0_state).publish_state("poor");
-          }
-      - component.update:
-          id: state
-    disabled_by_default: false
-    force_update: false
-    unit_of_measurement: µg/m³
-    icon: mdi:chemical-weapon
-    device_class: pm1
-    state_class: measurement
-  pm_2_5:
-    name: PM <2.5µm Weight concentration
-    id: sen55_pm2_5
-    accuracy_decimals: 1
-    on_value:
-    - then:
-      - lambda: !lambda |-
-          if (x >= id(pm2_5_good_min).state && x <= id(pm2_5_good_max).state) {
-            id(pm2_5_state).publish_state("good");
-          } else if (x >= id(pm2_5_fair_min).state && x <= id(pm2_5_fair_max).state) {
-            id(pm2_5_state).publish_state("fair");
-          } else {
-            id(pm2_5_state).publish_state("poor");
-          }
-      - component.update:
-          id: state
-    disabled_by_default: false
-    force_update: false
-    unit_of_measurement: µg/m³
-    icon: mdi:chemical-weapon
-    device_class: pm25
-    state_class: measurement
-  pm_4_0:
-    name: PM <4µm Weight concentration
-    id: sen55_pm4_0
-    accuracy_decimals: 1
-    on_value:
-    - then:
-      - lambda: !lambda |-
-          if (x >= id(pm4_0_good_min).state && x <= id(pm4_0_good_max).state) {
-            id(pm4_0_state).publish_state("good");
-          } else if (x >= id(pm4_0_fair_min).state && x <= id(pm4_0_fair_max).state) {
-            id(pm4_0_state).publish_state("fair");
-          } else {
-            id(pm4_0_state).publish_state("poor");
-          }
-      - component.update:
-          id: state
-    disabled_by_default: false
-    force_update: false
-    unit_of_measurement: µg/m³
-    icon: mdi:chemical-weapon
-    state_class: measurement
-  pm_10_0:
-    name: PM <10µm Weight concentration
-    id: sen55_pm10_0
-    accuracy_decimals: 1
-    on_value:
-    - then:
-      - lambda: !lambda |-
-          if (x >= id(pm10_0_good_min).state && x <= id(pm10_0_good_max).state) {
-            id(pm10_0_state).publish_state("good");
-          } else if (x >= id(pm10_0_fair_min).state && x <= id(pm10_0_fair_max).state) {
-            id(pm10_0_state).publish_state("fair");
-          } else {
-            id(pm10_0_state).publish_state("poor");
-          }
-      - component.update:
-          id: state
-    disabled_by_default: false
-    force_update: false
-    unit_of_measurement: µg/m³
-    icon: mdi:chemical-weapon
-    device_class: pm10
-    state_class: measurement
-  voc:
-    name: VOC
-    id: sen55_voc
-    algorithm_tuning:
-      index_offset: 100
-      learning_time_offset_hours: 12
-      learning_time_gain_hours: 12
-      gating_max_duration_minutes: 180
-      std_initial: 50
-      gain_factor: 230
-    on_value:
-    - then:
-      - lambda: !lambda |-
-          if (x >= id(voc_good_min).state && x <= id(voc_good_max).state) {
-            id(voc_state).publish_state("good");
-          } else if (x >= id(voc_fair_min).state && x <= id(voc_fair_max).state) {
-            id(voc_state).publish_state("fair");
-          } else {
-            id(voc_state).publish_state("poor");
-          }
-      - component.update:
-          id: state
-    disabled_by_default: false
-    force_update: false
-    icon: mdi:radiator
-    accuracy_decimals: 0
-    device_class: aqi
-    state_class: measurement
-  nox:
-    name: NOX
-    id: sen55_nox
-    algorithm_tuning:
-      index_offset: 1
-      learning_time_offset_hours: 12
-      learning_time_gain_hours: 12
-      gating_max_duration_minutes: 180
-      std_initial: 50
-      gain_factor: 230
-    on_value:
-    - then:
-      - lambda: !lambda |-
-          if (x >= id(nox_good_min).state && x <= id(nox_good_max).state) {
-            id(nox_state).publish_state("good");
-          } else if (x >= id(nox_fair_min).state && x <= id(nox_fair_max).state) {
-            id(nox_state).publish_state("fair");
-          } else {
-            id(nox_state).publish_state("poor");
-          }
-      - component.update:
-          id: state
-    disabled_by_default: false
-    force_update: false
-    icon: mdi:radiator
-    accuracy_decimals: 0
-    device_class: aqi
-    state_class: measurement
-  temperature_compensation:
-    offset: -1.5
-    normalized_offset_slope: 0.0
-    time_constant: 0
-- platform: veml6040
-  id: veml6040_sensor
-  glass_attenuation_factor: 0.42
-  color_temperature:
-    name: Ambient Light CCT
-    id: veml6040_color_temperature
-    disabled_by_default: false
-    force_update: false
-    unit_of_measurement: K
-    icon: mdi:thermometer
-    accuracy_decimals: 1
-    state_class: measurement
-  illuminance:
-    name: Ambient Light
-    id: veml6040_illuminance
-    filters:
-    - lambda: !lambda |-
-        return x + id(illuminance_offset_ui).state;
-    disabled_by_default: false
-    force_update: false
-    unit_of_measurement: lx
-    icon: mdi:lightbulb
-    accuracy_decimals: 1
-    device_class: illuminance
-    state_class: measurement
-  integration_time: 80ms
-  update_interval: 60s
-  address: 0x10
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: "diagnostic"
+
+
 sound_level_meter:
-- update_interval: 60s
+  update_interval: 60s
   is_on: true
   buffer_size: 1024
   warmup_interval: 500ms
   task_stack_size: 4096
   task_priority: 2
   task_core: 1
-  mic_sensitivity: -26.0
-  mic_sensitivity_ref: 94.0
-  offset: 0.0
+  mic_sensitivity: -26dB
+  mic_sensitivity_ref: 94dB
+  offset: 0dB
   groups:
-  - filters:
-    - coeffs:
-      - - 0.47732642
-        - 0.46294358
-        - 0.11224797
-        - 0.06681948
-        - 0.00111522
-      - - 1.0
-        - -1.9890593
-        - 0.98908925
-        - -1.9975533
-        - 0.99755484
-      type: sos
-    groups:
     - filters:
-      - coeffs:
-        - - 0.16999495
-          - 0.741029
-          - 0.52548885
-          - -0.11321865
-          - -0.056549273
-        - - 1.0
-          - -2.00027
-          - 1.0002706
-          - -0.03433284
-          - -0.79215795
-        - - 1.0
-          - -0.709303
-          - -0.29071867
-          - -1.9822421
-          - 0.9822986
-        type: sos
-      sensors:
-      - name: Ambient Sound Level (LAeq_1min)
-        id: soundlevel_laeq_1min
-        unit_of_measurement: dBA
-        disabled_by_default: false
-        force_update: false
-        accuracy_decimals: 2
-        state_class: measurement
-        type: eq
-      - name: Ambient Sound Level (LApeak_1min)
-        id: soundlevel_lapeak_1min
-        unit_of_measurement: dBA
-        disabled_by_default: false
-        force_update: false
-        accuracy_decimals: 2
-        state_class: measurement
-        type: peak
+        - type: sos
+          coeffs:
+            # ICS-43434:
+            - [ 0.47732642,  0.46294358, 0.11224797, 0.06681948, 0.00111522]
+            - [ 1.,         -1.9890593,  0.98908925, -1.9975533, 0.99755484]
+
+      groups:
+        - filters:
+            - type: sos
+              coeffs:
+                # A-weighting:
+                - [ 0.16999495 ,  0.741029   ,  0.52548885 , -0.11321865 , -0.056549273]
+                - [ 1.         , -2.00027    ,  1.0002706  , -0.03433284 , -0.79215795 ]
+                - [ 1.         , -0.709303   , -0.29071867 , -1.9822421  ,  0.9822986  ]
+          sensors:
+            - type: eq
+              name: Ambient Sound Level (LAeq_1min)
+              id: soundlevel_laeq_1min
+              unit_of_measurement: dBA
+            - type: peak
+              name: Ambient Sound Level (LApeak_1min)
+              id: soundlevel_lapeak_1min
+              unit_of_measurement: dBA
+
 number:
-- platform: template
-  name: Temperature Offset
-  id: temperature_offset_ui
-  unit_of_measurement: °C
-  min_value: -20.0
-  max_value: 20.0
-  step: 0.1
-  mode: BOX
-  update_interval: never
-  optimistic: true
-  restore_value: true
-  initial_value: 0.0
-  icon: mdi:thermometer
-  entity_category: config
-  on_value:
-  - then:
-    - component.update:
-        id: sht4x_sensor
-  disabled_by_default: false
-- platform: template
-  name: Humidity Offset
-  id: humidity_offset_ui
-  unit_of_measurement: '%'
-  min_value: -50.0
-  max_value: 50.0
-  step: 0.1
-  mode: BOX
-  update_interval: never
-  optimistic: true
-  restore_value: true
-  initial_value: 0.0
-  icon: mdi:water-percent
-  entity_category: config
-  on_value:
-  - then:
-    - component.update:
-        id: sht4x_sensor
-  disabled_by_default: false
-- platform: template
-  name: Ambient Light Offset
-  id: illuminance_offset_ui
-  unit_of_measurement: lx
-  min_value: -50.0
-  max_value: 50.0
-  step: 1.0
-  mode: BOX
-  update_interval: never
-  optimistic: true
-  restore_value: true
-  initial_value: 0.0
-  icon: mdi:brightness-5
-  entity_category: config
-  on_value:
-  - then:
-    - component.update:
-        id: veml6040_sensor
-  disabled_by_default: false
-- platform: template
-  id: temperature_good_min
-  name: Temperature Good Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: -40.0
-  max_value: 125.0
-  initial_value: 17.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: °C
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: temperature_good_max
-  name: Temperature Good Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: -40.0
-  max_value: 125.0
-  initial_value: 23.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: °C
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: temperature_fair_min
-  name: Temperature Fair Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: -40.0
-  max_value: 125.0
-  initial_value: 13.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: °C
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: temperature_fair_max
-  name: Temperature Fair Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: -40.0
-  max_value: 125.0
-  initial_value: 24.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: °C
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: humidity_good_min
-  name: Humidity Good Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 100.0
-  initial_value: 30.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: '%'
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: humidity_good_max
-  name: Humidity Good Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 100.0
-  initial_value: 60.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: '%'
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: humidity_fair_min
-  name: Humidity Fair Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 100.0
-  initial_value: 25.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: '%'
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: humidity_fair_max
-  name: Humidity Fair Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 100.0
-  initial_value: 70.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: '%'
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: co2_good_min
-  name: CO2 Good Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 400.0
-  max_value: 5000.0
-  initial_value: 400.0
-  optimistic: true
-  step: 1.0
-  restore_value: true
-  unit_of_measurement: ppm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: co2_good_max
-  name: CO2 Good Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 400.0
-  max_value: 5000.0
-  initial_value: 1000.0
-  optimistic: true
-  step: 1.0
-  restore_value: true
-  unit_of_measurement: ppm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: co2_fair_min
-  name: CO2 Fair Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 400.0
-  max_value: 1000.0
-  initial_value: 1000.0
-  optimistic: true
-  step: 1.0
-  restore_value: true
-  unit_of_measurement: ppm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: co2_fair_max
-  name: CO2 Fair Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 400.0
-  max_value: 5000.0
-  initial_value: 1500.0
-  optimistic: true
-  step: 1.0
-  restore_value: true
-  unit_of_measurement: ppm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm1_0_good_min
-  name: PM <1µm Good Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 0.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm1_0_good_max
-  name: PM <1µm Good Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 10.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm1_0_fair_min
-  name: PM <1µm Fair Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 10.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm1_0_fair_max
-  name: PM <1µm Fair Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 40.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm2_5_good_min
-  name: PM <2.5µm Good Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 0.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm2_5_good_max
-  name: PM <2.5µm Good Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 20.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm2_5_fair_min
-  name: PM <2.5µm Fair Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 20.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm2_5_fair_max
-  name: PM <2.5µm Fair Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 50.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm4_0_good_min
-  name: PM <4µm Good Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 0.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm4_0_good_max
-  name: PM <4µm Good Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 30.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm4_0_fair_min
-  name: PM <4µm Fair Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 30.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm4_0_fair_max
-  name: PM <4µm Fair Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 90.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm10_0_good_min
-  name: PM <10µm Good Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 0.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm10_0_good_max
-  name: PM <10µm Good Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 40.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm10_0_fair_min
-  name: PM <10µm Fair Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 40.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm10_0_fair_max
-  name: PM <10µm Fair Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 1000.0
-  initial_value: 100.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  unit_of_measurement: µm
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: voc_good_min
-  name: VOC Good Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 500.0
-  initial_value: 0.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: voc_good_max
-  name: VOC Good Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 500.0
-  initial_value: 150.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: voc_fair_min
-  name: VOC Fair Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 500.0
-  initial_value: 150.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: voc_fair_max
-  name: VOC Fair Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 500.0
-  initial_value: 250.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: nox_good_min
-  name: NOX Good Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 500.0
-  initial_value: 0.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: nox_good_max
-  name: NOX Good Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 500.0
-  initial_value: 20.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: nox_fair_min
-  name: NOX Fair Min
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 500.0
-  initial_value: 20.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: nox_fair_max
-  name: NOX Fair Max
-  icon: mdi:arrow-left-right
-  entity_category: config
-  min_value: 0.0
-  max_value: 500.0
-  initial_value: 100.0
-  optimistic: true
-  step: 0.1
-  restore_value: true
-  mode: BOX
-  update_interval: never
-  disabled_by_default: false
+  - platform: template
+    name: "Temperature Offset"
+    id: temperature_offset_ui
+    unit_of_measurement: "°C"
+    min_value: -20
+    max_value: 20
+    step: 0.1
+    mode: box
+    update_interval: never
+    optimistic: true
+    restore_value: true
+    initial_value: 0
+    icon: "mdi:thermometer"
+    entity_category: config
+    on_value:
+      - component.update: sht4x_sensor
+
+  - platform: template
+    name: "Humidity Offset"
+    id: humidity_offset_ui
+    unit_of_measurement: "%"
+    min_value: -50
+    max_value: 50
+    step: 0.1
+    mode: box
+    update_interval: never
+    optimistic: true
+    restore_value: true
+    initial_value: 0
+    icon: "mdi:water-percent"
+    entity_category: config
+    on_value:
+      - component.update: sht4x_sensor
+
+  - platform: template
+    name: "Ambient Light Offset"
+    id: illuminance_offset_ui
+    unit_of_measurement: "lx"
+    min_value: -50
+    max_value: 50
+    step: 1
+    mode: box
+    update_interval: never
+    optimistic: true
+    restore_value: true
+    initial_value: 0
+    icon: "mdi:brightness-5"
+    entity_category: config
+    on_value:
+      - component.update: veml6040_sensor
+
+
+  - platform: template
+    id: temperature_good_min
+    name: Temperature Good Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: -40
+    max_value: 125
+    initial_value: 17
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: °C
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: temperature_good_max
+    name: Temperature Good Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: -40
+    max_value: 125
+    initial_value: 23
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: °C
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: temperature_fair_min
+    name: Temperature Fair Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: -40
+    max_value: 125
+    initial_value: 13
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: °C
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: temperature_fair_max
+    name: Temperature Fair Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: -40
+    max_value: 125
+    initial_value: 24
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: °C
+    mode: box
+    update_interval: never
+
+
+
+  - platform: template
+    id: humidity_good_min
+    name: Humidity Good Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 100
+    initial_value: 30
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "%"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: humidity_good_max
+    name: Humidity Good Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 100
+    initial_value: 60
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "%"
+    mode: box
+    update_interval: never
+    
+  - platform: template
+    id: humidity_fair_min
+    name: Humidity Fair Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 100
+    initial_value: 25
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "%"
+    mode: box
+    update_interval: never
+    
+  - platform: template
+    id: humidity_fair_max
+    name: Humidity Fair Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 100
+    initial_value: 70
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "%"
+    mode: box
+    update_interval: never
+
+
+
+  - platform: template
+    id: co2_good_min
+    name: CO2 Good Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 400
+    max_value: 5000
+    initial_value: 400
+    optimistic: true
+    step: 1
+    restore_value: true
+    unit_of_measurement: "ppm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: co2_good_max
+    name: CO2 Good Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 400
+    max_value: 5000
+    initial_value: 1000
+    optimistic: true
+    step: 1
+    restore_value: true
+    unit_of_measurement: "ppm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: co2_fair_min
+    name: CO2 Fair Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 400
+    max_value: 1000
+    initial_value: 1000
+    optimistic: true
+    step: 1
+    restore_value: true
+    unit_of_measurement: "ppm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: co2_fair_max
+    name: CO2 Fair Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 400
+    max_value: 5000
+    initial_value: 1500
+    optimistic: true
+    step: 1
+    restore_value: true
+    unit_of_measurement: "ppm"
+    mode: box
+    update_interval: never
+
+
+
+  - platform: template
+    id: pm1_0_good_min
+    name: PM <1µm Good Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 0
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: pm1_0_good_max
+    name: PM <1µm Good Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 10
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: pm1_0_fair_min
+    name: PM <1µm Fair Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 10
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: pm1_0_fair_max
+    name: PM <1µm Fair Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 40
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+
+
+  - platform: template
+    id: pm2_5_good_min
+    name: PM <2.5µm Good Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 0
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: pm2_5_good_max
+    name: PM <2.5µm Good Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 20
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: pm2_5_fair_min
+    name: PM <2.5µm Fair Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 20
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: pm2_5_fair_max
+    name: PM <2.5µm Fair Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 50
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+
+
+  - platform: template
+    id: pm4_0_good_min
+    name: PM <4µm Good Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 0
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: pm4_0_good_max
+    name: PM <4µm Good Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 30
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: pm4_0_fair_min
+    name: PM <4µm Fair Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 30
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: pm4_0_fair_max
+    name: PM <4µm Fair Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 90
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+
+
+  - platform: template
+    id: pm10_0_good_min
+    name: PM <10µm Good Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 0
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: pm10_0_good_max
+    name: PM <10µm Good Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 40
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: pm10_0_fair_min
+    name: PM <10µm Fair Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 40
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: pm10_0_fair_max
+    name: PM <10µm Fair Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 1000
+    initial_value: 100
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    unit_of_measurement: "µm"
+    mode: box
+    update_interval: never
+
+
+
+  - platform: template
+    id: voc_good_min
+    name: VOC Good Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 500
+    initial_value: 0
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: voc_good_max
+    name: VOC Good Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 500
+    initial_value: 150
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: voc_fair_min
+    name: VOC Fair Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 500
+    initial_value: 150
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: voc_fair_max
+    name: VOC Fair Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 500
+    initial_value: 250
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    mode: box
+    update_interval: never
+
+
+
+  - platform: template
+    id: nox_good_min
+    name: NOX Good Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 500
+    initial_value: 0
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: nox_good_max
+    name: NOX Good Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 500
+    initial_value: 20
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: nox_fair_min
+    name: NOX Fair Min
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 500
+    initial_value: 20
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    mode: box
+    update_interval: never
+
+  - platform: template
+    id: nox_fair_max
+    name: NOX Fair Max
+    icon: mdi:arrow-left-right
+    entity_category: config
+    min_value: 0
+    max_value: 500
+    initial_value: 100
+    optimistic: true
+    step: 0.1
+    restore_value: true
+    mode: box
+    update_interval: never
+
 text_sensor:
-- platform: template
-  id: state
-  name: State
-  update_interval: never
-  lambda: !lambda "auto states = {\n  id(temperature_state).state,\n  id(humidity_state).state,\n\
-    \  id(co2_state).state,\n  id(pm1_0_state).state,\n  id(pm2_5_state).state,\n\
-    \  id(pm4_0_state).state,\n  id(pm10_0_state).state,\n  id(voc_state).state,\n\
-    \  id(nox_state).state,\n};\n\nauto *poor = std::find(std::begin(states), std::end(states),\
-    \ \"poor\");\nif (poor != std::end(states)) {\n  return {\"poor\"};  \n}\n\nauto\
-    \ *fair = std::find(std::begin(states), std::end(states), \"fair\");\nif (fair\
-    \ != std::end(states)) {\n  return {\"fair\"};  \n}\n\nreturn {\"good\"};"
-  on_value:
-  - then:
-    - if:
-        condition:
-          and:
-          - lambda: !lambda |-
-              return x == "good";
-        then:
-        - light.control:
-            id: indicator_light_internal
-            blue: 0.0
-            green: 1.0
-            red: 0.0
-            effect: None
-        else:
-        - if:
-            condition:
-              and:
-              - lambda: !lambda |-
-                  return x == "fair";
-            then:
-            - light.control:
-                id: indicator_light_internal
-                blue: 0.0
-                green: 0.647
-                red: 1.0
-                effect: None
-            else:
-            - light.control:
-                id: indicator_light_internal
-                blue: 0.0
-                green: 0.0
-                red: 1.0
-                effect: None
-  disabled_by_default: false
-- platform: template
-  id: temperature_state
-  name: Temperature State
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: humidity_state
-  name: Humidity State
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: co2_state
-  name: CO2 State
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm1_0_state
-  name: PM <1µm State
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm2_5_state
-  name: PM <2.5µm State
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm4_0_state
-  name: PM <4µm State
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: pm10_0_state
-  name: PM <10µm State
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: voc_state
-  name: VOC State
-  update_interval: never
-  disabled_by_default: false
-- platform: template
-  id: nox_state
-  name: NOX State
-  update_interval: never
-  disabled_by_default: false
-logger:
-  baud_rate: 115200
-  tx_buffer_size: 512
-  deassert_rts_dtr: false
-  hardware_uart: UART0
-  level: DEBUG
-  logs: {}
-api:
-  port: 6053
-  reboot_timeout: 15min
-ota:
-  safe_mode: true
-  version: 2
-  port: 3232
-  reboot_timeout: 5min
-  num_attempts: 10
-dashboard_import:
-  package_import_url: github://airlytix/configuration/airlytix-es1.yaml@main
-  import_full_config: false
-external_components:
-- source:
-    url: https://github.com/airlytix/esphome-sound-level-meter.git
-    ref: main
-    type: git
-  refresh: 1d
-  components: all
-- source:
-    url: https://github.com/airlytix/configuration.git
-    ref: main
-    type: git
-  refresh: 1d
-  components: all
-wifi:
-  ap:
-    ap_timeout: 1min
-  domain: .local
-  reboot_timeout: 15min
-  power_save_mode: LIGHT
-  fast_connect: false
-  enable_btm: false
-  enable_rrm: false
-  passive_scan: false
-  enable_on_boot: true
-  use_address: airlytix-es1.local
-captive_portal: {}
-esp32_improv:
-  authorizer: none
-  identify_duration: 10s
-  authorized_duration: 1min
-  wifi_timeout: 1min
-improv_serial: {}
-interval:
-- interval: 1s
-  then:
-  - if:
-      condition:
-        wifi.connected: {}
+  - platform: template
+    id: "state"
+    name: "State"
+    update_interval: never
+
+    lambda: |-
+      auto states = {
+        id(temperature_state).state,
+        id(humidity_state).state,
+        id(co2_state).state,
+        id(pm1_0_state).state,
+        id(pm2_5_state).state,
+        id(pm4_0_state).state,
+        id(pm10_0_state).state,
+        id(voc_state).state,
+        id(nox_state).state,
+      };
+
+      auto *poor = std::find(std::begin(states), std::end(states), "poor");
+      if (poor != std::end(states)) {
+        return {"poor"};  
+      }
+
+      auto *fair = std::find(std::begin(states), std::end(states), "fair");
+      if (fair != std::end(states)) {
+        return {"fair"};  
+      }
+
+      return {"good"};
+    on_value: 
       then:
-      - if:
-          condition:
-            api.connected: {}
-          then:
-          - output.turn_off:
-              id: status_led_2
-          else:
-          - output.turn_on:
-              id: status_led_2
-          - delay: 500ms
-          - output.turn_off:
-              id: status_led_2
-          - delay: 500ms
-      else:
-      - output.turn_on:
-          id: status_led_2
-      - delay: 200ms
-      - output.turn_off:
-          id: status_led_2
-      - delay: 200ms
-  startup_delay: 0s
+        - if: 
+            condition: 
+              - lambda: return x == "good";
+            then:
+              - light.control: 
+                  id: indicator_light_internal
+                  blue: 0
+                  green: 1
+                  red: 0
+                  effect: "None"
+            else:
+              if:
+                condition:                  
+                  - lambda: return x == "fair";
+                then:
+                  - light.control: 
+                      id: indicator_light_internal
+                      blue: 0
+                      green: 0.647
+                      red: 1
+                      effect: "None"
+                else:
+                  - light.control: 
+                      id: indicator_light_internal
+                      blue: 0
+                      green: 0
+                      red: 1
+                      effect: "None"
+
+  - platform: template
+    id: "temperature_state"
+    name: "Temperature State"
+    update_interval: never
+  - platform: template
+    id: "humidity_state"
+    name: "Humidity State"
+    update_interval: never
+  - platform: template
+    id: "co2_state"
+    name: "CO2 State"
+    update_interval: never
+  - platform: template
+    id: "pm1_0_state"
+    name: "PM <1µm State"
+    update_interval: never
+  - platform: template
+    id: "pm2_5_state"
+    name: "PM <2.5µm State"
+    update_interval: never
+  - platform: template
+    id: "pm4_0_state"
+    name: "PM <4µm State"
+    update_interval: never
+  - platform: template
+    id: "pm10_0_state"
+    name: "PM <10µm State"
+    update_interval: never
+  - platform: template
+    id: "voc_state"
+    name: "VOC State"
+    update_interval: never
+  - platform: template
+    id: "nox_state"
+    name: "NOX State"
+    update_interval: never
+
 status_led:
-  pin:
-    number: 32
-    mode:
-      output: true
-      input: false
-      open_drain: false
-      pullup: false
-      pulldown: false
-    inverted: false
-    ignore_strapping_warning: false
-    drive_strength: 20.0
+  pin: GPIO32
+
 i2c:
-- sda: 20
-  scl: 19
+  sda: GPIO20
+  scl: GPIO19
   scan: true
   id: i2c_bus_a
-  sda_pullup_enabled: true
-  scl_pullup_enabled: true
-  frequency: 50000.0
-i2s:
-- bck_pin:
-    number: 4
-    mode:
-      output: true
-      input: false
-      open_drain: false
-      pullup: false
-      pulldown: false
-    inverted: false
-    ignore_strapping_warning: false
-    drive_strength: 20.0
-  ws_pin:
-    number: 27
-    mode:
-      output: true
-      input: false
-      open_drain: false
-      pullup: false
-      pulldown: false
-    inverted: false
-    ignore_strapping_warning: false
-    drive_strength: 20.0
-  din_pin:
-    number: 14
-    mode:
-      input: true
-      output: false
-      open_drain: false
-      pullup: false
-      pulldown: false
-    inverted: false
-    ignore_strapping_warning: false
-    drive_strength: 20.0
-  sample_rate: 48000
-  bits_per_sample: 32
-  dma_buf_count: 8
-  dma_buf_len: 256
-  use_apll: true
-  bits_shift: 8
 
+i2s:
+ bck_pin: GPIO4
+ ws_pin: GPIO27
+ din_pin: GPIO14
+ sample_rate: 48000
+ bits_per_sample: 32
+ dma_buf_count: 8
+ dma_buf_len: 256
+ use_apll: true
+ bits_shift: 8
