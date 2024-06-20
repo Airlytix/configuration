@@ -40,7 +40,7 @@ jobs:
         uses: esphome/build-action@v1.8.0
         with:
           yaml_file:  ${{ matrix.config_file }}.yaml
-          version: "2024.3.0"
+          version: "2024.6.1"
 
       - run: |
           mkdir output
@@ -84,7 +84,7 @@ jobs:
               echo $name
               version=$(grep -E '^\s+project_version:' "$name.yaml" | awk '{print $2}' | tr -d '"')
               pushd "output/$name"
-              jq -s "{\"name\": \"$name\", \"version\": \"2024.3.0\", \"home_assistant_domain\": \"esphome\", \"new_install_prompt_erase\": true, \"builds\":.}" manifest.json > $pagesDir/$name.json
+              jq -s "{\"name\": \"$name\", \"version\": \"2024.6.1\", \"home_assistant_domain\": \"esphome\", \"new_install_prompt_erase\": true, \"builds\":.}" manifest.json > $pagesDir/$name.json
               find . -type f -name "*.bin" -exec rsync --relative {} "$pagesDir" \;
               popd
           done

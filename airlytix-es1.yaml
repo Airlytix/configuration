@@ -14,6 +14,7 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   name_add_mac_suffix: true
+  min_version: 2024.6.1
   project:
     name: ${project_name}
     version: ${project_version}
@@ -42,6 +43,7 @@ logger:
 api:
 
 ota:
+  platform: esphome
 
 dashboard_import:
   package_import_url: github://airlytix/configuration/airlytix-es1.yaml@main
