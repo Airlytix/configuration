@@ -4,9 +4,9 @@ substitutions:
   project_name: "airlytix.es1"
   project_version: "1.0.1"
   indicator_max_power: "1"
-  sht4x_temperature_offset: "-6.5"
-  sht4x_humidity_offset: "20"
-  sen55_temperature_offset: "-1.5"
+  sht4x_temperature_offset: "-11"
+  sht4x_humidity_offset: "30"
+  sen55_temperature_offset: "-6"
   sen55_humidity_offset: "0"
   veml6040_glass_attenuation: "0.42"
 
@@ -262,8 +262,6 @@ sensor:
       id: "sen55_temperature"
       accuracy_decimals: 1
       internal: true
-      filters:
-        - offset: ${sen55_temperature_offset}
     humidity:
       id: "sen55_humidity"
       accuracy_decimals: 1
