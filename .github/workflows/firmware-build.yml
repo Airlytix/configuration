@@ -39,7 +39,7 @@ jobs:
         id: esphome-build
         uses: esphome/build-action@v6.0.0
         with:
-          yaml_file:  ${{ matrix.config_file }}.yaml
+          yaml-file:  ${{ matrix.config_file }}.yaml
           version: "2024.6.1"
 
       - run: |
