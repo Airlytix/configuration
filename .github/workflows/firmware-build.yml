@@ -19,7 +19,7 @@ jobs:
     outputs:
       names: ${{ steps.set-matrix.outputs.names }}
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.2.2
       - id: set-matrix
         run: |
           echo "names=$(ls *.yaml | xargs -I{} basename {} | sed 's/\.[^.]*$//' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
@@ -33,13 +33,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v4.2.2
 
       - name: esphome build
         id: esphome-build
-        uses: esphome/build-action@v3.0.0
+        uses: esphome/build-action@v6.0.0
         with:
-          yaml_file:  ${{ matrix.config_file }}.yaml
+          yaml-file:  ${{ matrix.config_file }}.yaml
           version: "2024.6.1"
 
       - run: |
@@ -47,7 +47,7 @@ jobs:
           find "${{ steps.esphome-build.outputs.name }}" -type f -name "*.bin" -exec rsync --relative {} "output/${{ matrix.config_file }}" \;
           mv "${{ steps.esphome-build.outputs.name }}/manifest.json" output/${{ matrix.config_file }}/manifest.json
 
-      - uses: actions/upload-artifact@v4.0.0
+      - uses: actions/upload-artifact@v4.6.0
         with:
           name: ${{ matrix.config_file }}
           path: output
@@ -69,8 +69,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
       
     steps:
-      - uses: actions/checkout@v4.1.1
-      - uses: actions/download-artifact@v4.1.0
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/download-artifact@v4.1.8
         with:
           path: output
           merge-multiple: true
@@ -90,9 +90,9 @@ jobs:
           done
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3.0.0
+        uses: actions/upload-pages-artifact@v3.0.1
         with:
           path: gh-pages
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4.0.0
+        uses: actions/deploy-pages@v4.0.5
