@@ -135,19 +135,9 @@ void SoundLevelMeter::task(void *param) {
             // read_ returned no data; skip processing this iteration
             continue;
         }
-        process_start = millis();
 
         for (auto *g : this_->groups_) {
             g->process(this_->float_buffer_);
-        }
-
-        process_time += millis() - process_start;
-        process_count += buffer.size();
-        auto sr = this_->get_sample_rate();
-        if (process_count >= sr * (this_->update_interval_ / 1000.f)) {
-            auto t = uint32_t(float(process_time) / process_count * (sr / 1000.f));
-            ESP_LOGD(TAG, "Processing time per 1s of audio data (%u samples): %u ms", sr, t);
-            process_time = process_count = 0;
         }
     }
 }
@@ -276,7 +266,6 @@ void SoundLevelMeterSensor::set_update_interval(uint32_t update_interval)
 
 void SoundLevelMeterSensor::defer_publish_state(float state)
 {
-    ESP_LOGD(TAG, "Defer publish state %f", state);
     this->parent_->defer([this, state]()
                             { this->publish_state(state); });
 }

@@ -37,6 +37,13 @@ esp32:
   framework:
     type: esp-idf
     version: recommended
+    sdkconfig_options:
+      CONFIG_ESP32_DEFAULT_CPU_FREQ_240: y
+      CONFIG_COMPILER_OPTIMIZATION_SIZE: n
+      CONFIG_COMPILER_OPTIMIZATION_PERF: y
+    components:
+      - name: esp-dsp
+        source: github://espressif/esp-dsp
 
 logger:
 
