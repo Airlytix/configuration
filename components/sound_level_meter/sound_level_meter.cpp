@@ -16,6 +16,16 @@ static const char *const TAG = "sound_level_meter";
 // see: https://dsp.stackexchange.com/a/50947/65262
 static constexpr float DBFS_OFFSET = 20 * log10(sqrt(2));
 
+struct AudioChunk {
+    std::vector<float> data;
+};
+
+struct PublishState {
+    SoundLevelMeterSensor *sensor;
+    float data;
+};
+
+
 uint32_t SoundLevelMeter::get_sample_rate() { return this->sample_rate_; }
 
 void SoundLevelMeter::dump_config() {
@@ -29,9 +39,6 @@ void SoundLevelMeter::dump_config() {
     if (this->get_offset().has_value())
         ESP_LOGCONFIG(TAG, "  Offset %fdB", *this->get_offset());
     ESP_LOGCONFIG(TAG, "  Warmup Interval: %u ms", this->warmup_interval_);
-    ESP_LOGCONFIG(TAG, "  Task Stack Size: %u", this->task_stack_size_);
-    ESP_LOGCONFIG(TAG, "  Task Priority: %u", this->task_priority_);
-    ESP_LOGCONFIG(TAG, "  Task Core: %u", this->task_core_);
     LOG_UPDATE_INTERVAL(this);
     if (this->groups_.size() > 0) {
       ESP_LOGCONFIG(TAG, "  Groups:");
@@ -100,20 +107,26 @@ void SoundLevelMeter::setup()
         return;
     }
     }
-    this->status_clear_error();
 
-    xTaskCreatePinnedToCore(SoundLevelMeter::task, "sound_level_meter", this->task_stack_size_, this,
-        this->task_priority_, nullptr, this->task_core_);
-}
+    this->publish_queue_ = xQueueCreate(8, sizeof(PublishState));
+    if (this->publish_queue_ == nullptr) {
+        ESP_LOGE(TAG, "Could not create publish queue!");
+        this->mark_failed();
+        return;
+    }
+
+    xTaskCreatePinnedToCore(SoundLevelMeter::task, "sound_level_meter", 4095, this, 3, nullptr, 1);
+
+    this->status_clear_error();
+} 
 
 void SoundLevelMeter::loop()
 {
-    std::lock_guard<std::mutex> lock(this->defer_mutex_);
-    if (!this->defer_queue_.empty())
-    {
-        auto &f = this->defer_queue_.front();
-        f();
-        this->defer_queue_.pop();
+    PublishState ps;
+    if (xQueueReceive(this->publish_queue_, &ps, 0) == pdTRUE) {
+        if (ps.sensor != nullptr) {
+            ps.sensor->publish_state(ps.data);
+        }
     }
 }
 
@@ -122,27 +135,33 @@ void SoundLevelMeter::task(void *param) {
 
     std::vector<int32_t> buffer;
     buffer.resize(32 * this_->get_sample_rate() / 1000);
+    std::vector<float> buffer_float;
+    buffer_float.resize(buffer.size());
 
-    auto warmup_start = millis();
-    while (millis() - warmup_start < this_->warmup_interval_)
-        this_->read_(buffer.data(), buffer.size());
+    this->warmup_start_ = millis();
 
-    uint32_t process_time = 0, process_count = 0;
-    uint64_t process_start;
-    while(true) {
-        size_t frames_got = this_->read_(buffer.data(), buffer.size());
+    while (true) {
+        size_t frames_got = this_->read_(buffer.data(), buffer.size(), buffer_float);
         if (frames_got == 0) {
-            // read_ returned no data; skip processing this iteration
+            taskYIELD();
             continue;
         }
 
-        for (auto *g : this_->groups_) {
-            g->process(this_->float_buffer_);
+        if (millis() - this_->warmup_start_ < this_->warmup_interval_) {
+            taskYIELD();
+            continue;
         }
+
+
+        for (auto *g : this_->groups_) {
+            g->process(buffer_float);
+        }
+
+        taskYIELD();
     }
 }
 
-size_t SoundLevelMeter::read_(int32_t *buf, size_t frames_requested) {
+size_t SoundLevelMeter::read_(int32_t *buf, size_t frames_requested, std::vector<float> &buffer) {
      // 'frames_requested' is how many 32-bit frames we want.
     // Convert that to bytes for i2s_read:
     const size_t bytes_to_read = frames_requested * sizeof(int32_t);
@@ -175,7 +194,7 @@ size_t SoundLevelMeter::read_(int32_t *buf, size_t frames_requested) {
 
     // Now parse each 32-bit frame as top-24-bit audio.
     // We'll fill our 'float_buffer_' so the processing stage can see float data.
-    this->float_buffer_.resize(frames_read);
+    buffer.resize(frames_read);
 
     for (size_t i = 0; i < frames_read; i++) {
         // The ICS-43434 uses the top 24 bits.
@@ -186,16 +205,11 @@ size_t SoundLevelMeter::read_(int32_t *buf, size_t frames_requested) {
         // Full-scale 24-bit is ±(1<<23).
         float sample_f = static_cast<float>(s24) / static_cast<float>(1 << 23);
 
-        this->float_buffer_[i] = sample_f;
+        buffer[i] = sample_f;
     }
 
     // Return how many frames of float data we prepared in float_buffer_.
     return frames_read;
-}
-
-void SoundLevelMeter::defer(std::function<void()> &&f) {
-    std::lock_guard<std::mutex> lock(this->defer_mutex_);
-    this->defer_queue_.push(std::move(f));
 }
 
 void SoundLevelMeter::reset() {
@@ -230,15 +244,19 @@ void SensorGroup::dump_config(const char *prefix)
 void SensorGroup::process(std::vector<float> &buffer)
 {
     std::vector<float> &&data = this->filters_.size() > 0 ? std::vector<float>(buffer) : buffer;
-    if (this->filters_.size() > 0)
-        for (auto f : this->filters_)
+    if (this->filters_.size() > 0) {
+        for (auto f : this->filters_) {
             f->process(data);
+        }
+    }
 
-    for (auto s : this->sensors_)
+    for (auto s : this->sensors_) {
         s->process(data);
+    }
 
-    for (auto g : this->groups_)
+    for (auto g : this->groups_) {
         g->process(data);
+    }
 }
 
 void SensorGroup::reset()
@@ -264,17 +282,22 @@ void SoundLevelMeterSensor::set_update_interval(uint32_t update_interval)
     this->update_samples_ = this->parent_->get_sample_rate() * (update_interval / 1000.f);
 }
 
-void SoundLevelMeterSensor::defer_publish_state(float state)
+void SoundLevelMeterSensor::queue_publish_state(float state)
 {
-    this->parent_->defer([this, state]()
-                            { this->publish_state(state); });
+    PublishState ps;
+    ps.sensor = this;
+    ps.data = state;
+    BaseType_t ok = xQueueSend(this->parent_->publish_queue_, &ps, 0);
+    if (ok != pdTRUE) {
+        ESP_LOGW(TAG, "Failed to publish state!");
+    }
 }
 
 float SoundLevelMeterSensor::adjust_dB(float dB, bool is_rms)
 {
     // see: https://dsp.stackexchange.com/a/50947/65262
-    //if (is_rms)
-    //    dB += DBFS_OFFSET;
+    if (is_rms)
+        dB += DBFS_OFFSET;
 
     // see: https://invensense.tdk.com/wp-content/uploads/2015/02/AN-1112-v1.1.pdf
     // dBSPL = dBFS + mic_sensitivity_ref - mic_sensitivity
@@ -304,9 +327,9 @@ void SoundLevelMeterSensorEq::process(std::vector<float> &buffer)
         this->count_++;
         if (this->count_ == this->update_samples_)
         {
-            float dB = 10 * log10((sum_ + local_sum) / count_);
+            float dB = 10 * log10((this->sum_ + local_sum) / this->count_);
             dB = this->adjust_dB(dB);
-            this->defer_publish_state(dB);
+            this->queue_publish_state(dB);
             this->sum_ = 0;
             this->count_ = 0;
             local_sum = 0;
@@ -319,7 +342,7 @@ void SoundLevelMeterSensorEq::reset()
 {
     this->sum_ = 0.;
     this->count_ = 0;
-    this->defer_publish_state(NAN);
+    this->queue_publish_state(NAN);
 }
 
 /* SoundLevelMeterSensorMax */
@@ -346,7 +369,7 @@ void SoundLevelMeterSensorMax::process(std::vector<float> &buffer)
         {
             float dB = 10 * log10(this->max_);
             dB = this->adjust_dB(dB);
-            this->defer_publish_state(dB);
+            this->queue_publish_state(dB);
             this->max_ = std::numeric_limits<float>::min();
             this->count_max_ = 0;
         }
@@ -359,7 +382,7 @@ void SoundLevelMeterSensorMax::reset()
     this->max_ = std::numeric_limits<float>::min();
     this->count_max_ = 0;
     this->count_sum_ = 0;
-    this->defer_publish_state(NAN);
+    this->queue_publish_state(NAN);
 }
 
 /* SoundLevelMeterSensorMin */
@@ -386,7 +409,7 @@ void SoundLevelMeterSensorMin::process(std::vector<float> &buffer)
         {
             float dB = 10 * log10(this->min_);
             dB = this->adjust_dB(dB);
-            this->defer_publish_state(dB);
+            this->queue_publish_state(dB);
             this->min_ = std::numeric_limits<float>::max();
             this->count_min_ = 0;
         }
@@ -399,7 +422,7 @@ void SoundLevelMeterSensorMin::reset()
     this->min_ = std::numeric_limits<float>::max();
     this->count_min_ = 0;
     this->count_sum_ = 0;
-    this->defer_publish_state(NAN);
+    this->queue_publish_state(NAN);
 }
 
 /* SoundLevelMeterSensorPeak */
@@ -414,7 +437,7 @@ void SoundLevelMeterSensorPeak::process(std::vector<float> &buffer)
         {
             float dB = 20 * log10(this->peak_);
             dB = this->adjust_dB(dB, false);
-            this->defer_publish_state(dB);
+            this->queue_publish_state(dB);
             this->peak_ = 0.f;
             this->count_ = 0;
         }
@@ -425,7 +448,7 @@ void SoundLevelMeterSensorPeak::reset()
 {
     this->peak_ = 0.f;
     this->count_ = 0;
-    this->defer_publish_state(NAN);
+    this->queue_publish_state(NAN);
 }
 
 /* SOS_Filter */

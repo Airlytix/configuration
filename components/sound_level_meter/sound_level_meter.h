@@ -7,6 +7,7 @@
 #include "esphome/core/automation.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/i2s_audio/i2s_audio.h"
+#include <freertos/queue.h>
 
 namespace esphome {
 namespace sound_level_meter {
@@ -27,9 +28,6 @@ class SoundLevelMeter : public i2s_audio::I2SAudioIn, public Component {
     uint32_t get_update_interval() { return this->update_interval_; }
     void add_group(SensorGroup *group) { this->groups_.push_back(group); }
     void set_warmup_interval(uint32_t warmup_interval) { this->warmup_interval_ = warmup_interval; }
-    void set_task_stack_size(uint32_t task_stack_size) { this->task_stack_size_ = task_stack_size; }
-    void set_task_priority(uint8_t task_priority) { this->task_priority_ = task_priority; }
-    void set_task_core(uint8_t task_core) { this->task_core_ = task_core; }
     void set_mic_sensitivity(optional<float> mic_sensitivity) { this->mic_sensitivity_ = mic_sensitivity; }
     optional<float> get_mic_sensitivity() { return this->mic_sensitivity_; }
     void set_mic_sensitivity_ref(optional<float> mic_sensitivity_ref) { this->mic_sensitivity_ref_ = mic_sensitivity_ref; }
@@ -40,32 +38,22 @@ class SoundLevelMeter : public i2s_audio::I2SAudioIn, public Component {
     uint32_t get_sample_rate();
 
   protected:
-    size_t read_(int32_t *buf, size_t frames_requested);
+    size_t read_(int32_t *buf, size_t frames_requested, std::vector<float> &buffer);
   
     int8_t din_pin_{I2S_PIN_NO_CHANGE};
     bool pdm_{false};
 
     std::vector<SensorGroup *> groups_;
     uint32_t warmup_interval_{500};
-    uint32_t task_stack_size_{1024};
-    uint8_t task_priority_{1};
-    uint8_t task_core_{1};
+    uint32_t warmup_start_{0};
     optional<float> mic_sensitivity_{};
     optional<float> mic_sensitivity_ref_{};
     optional<float> offset_{};
-    std::queue<std::function<void()>> defer_queue_;
-    std::mutex defer_mutex_;
     uint32_t update_interval_{60000};
     uint8_t max_groups_depth_{1};
-
-    int16_t *input_buffer_{nullptr};
-    std::vector<float> float_buffer_;
+    QueueHandle_t publish_queue_;
   
-
     static void task(void *param);
-    // epshome's scheduler is not thred safe, so we have to use custom thread safe implementation
-    // to execute sensor updates in main loop
-    void defer(std::function<void()> &&f);
     void reset();
 };
 
@@ -93,7 +81,7 @@ class SoundLevelMeterSensor : public sensor::Sensor {
   void set_parent(SoundLevelMeter *parent);
   void set_update_interval(uint32_t update_interval);
   virtual void process(std::vector<float> &buffer) = 0;
-  void defer_publish_state(float state);
+  void queue_publish_state(float state);
 
  protected:
   SoundLevelMeter *parent_{nullptr};

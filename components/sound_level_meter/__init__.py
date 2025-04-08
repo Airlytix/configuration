@@ -48,9 +48,6 @@ CONF_PEAK = "peak"
 CONF_SOS = "sos"
 CONF_COEFFS = "coeffs"
 CONF_WARMUP_INTERVAL = "warmup_interval"
-CONF_TASK_STACK_SIZE = "task_stack_size"
-CONF_TASK_PRIORITY = "task_priority"
-CONF_TASK_CORE = "task_core"
 CONF_MIC_SENSITIVITY = "mic_sensitivity"
 CONF_MIC_SENSITIVITY_REF = "mic_sensitivity_ref"
 CONF_OFFSET = "offset"
@@ -136,9 +133,6 @@ CONFIG_SCHEMA =  BASE_SCHEMA.extend(
         cv.Optional(CONF_PDM, default=False): cv.boolean,
         cv.Optional(CONF_UPDATE_INTERVAL, default="60s"): cv.positive_time_period_milliseconds,
         cv.Optional(CONF_WARMUP_INTERVAL, default="500ms"): cv.positive_time_period_milliseconds,
-        cv.Optional(CONF_TASK_STACK_SIZE, default=4096): cv.positive_not_null_int,
-        cv.Optional(CONF_TASK_PRIORITY, default=2): cv.uint8_t,
-        cv.Optional(CONF_TASK_CORE, default=1): cv.int_range(0, 1),
         cv.Optional(CONF_MIC_SENSITIVITY): cv.decibel,
         cv.Optional(CONF_MIC_SENSITIVITY_REF): cv.decibel,
         cv.Optional(CONF_OFFSET): cv.decibel,
@@ -178,9 +172,6 @@ async def to_code(config):
     cg.add(var.set_pdm(config[CONF_PDM]))
     cg.add(var.set_update_interval(config[CONF_UPDATE_INTERVAL]))
     cg.add(var.set_warmup_interval(config[CONF_WARMUP_INTERVAL]))
-    cg.add(var.set_task_stack_size(config[CONF_TASK_STACK_SIZE]))
-    cg.add(var.set_task_priority(config[CONF_TASK_PRIORITY]))
-    cg.add(var.set_task_core(config[CONF_TASK_CORE]))
     cg.add(var.set_max_groups_depth(get_groups_depth(config[CONF_GROUPS]) + 1))
     if CONF_MIC_SENSITIVITY in config:
         cg.add(var.set_mic_sensitivity(config[CONF_MIC_SENSITIVITY]))

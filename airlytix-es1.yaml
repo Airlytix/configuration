@@ -420,9 +420,6 @@ sound_level_meter:
   use_apll: true
   update_interval: 60s
   warmup_interval: 500ms
-  task_stack_size: 4096
-  task_priority: 2
-  task_core: 1
   mic_sensitivity: -26dB
   mic_sensitivity_ref: 94dB
   offset: -47dB
