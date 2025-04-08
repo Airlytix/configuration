@@ -138,7 +138,7 @@ void SoundLevelMeter::task(void *param) {
     std::vector<float> buffer_float;
     buffer_float.resize(buffer.size());
 
-    this->warmup_start_ = millis();
+    this_->warmup_start_ = millis();
 
     while (true) {
         size_t frames_got = this_->read_(buffer.data(), buffer.size(), buffer_float);
