@@ -243,19 +243,18 @@ void SensorGroup::dump_config(const char *prefix)
 
 void SensorGroup::process(std::vector<float> &buffer)
 {
-    std::vector<float> &&data = this->filters_.size() > 0 ? std::vector<float>(buffer) : buffer;
-    if (this->filters_.size() > 0) {
+    if (!this->filters_.empty()) {
         for (auto f : this->filters_) {
-            f->process(data);
+            f->process(buffer);
         }
     }
 
     for (auto s : this->sensors_) {
-        s->process(data);
+        s->process(buffer);
     }
 
     for (auto g : this->groups_) {
-        g->process(data);
+        g->process(buffer);
     }
 }
 
