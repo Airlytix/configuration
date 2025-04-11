@@ -16,9 +16,7 @@ from esphome.const import (
 from esphome.components.i2s_audio import (
     CONF_I2S_DIN_PIN,
     CONF_RIGHT,
-    I2SAudioIn,
     i2s_audio_component_schema,
-    i2s_audio_ns,
     register_i2s_audio_component,
 )
 
