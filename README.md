@@ -4,9 +4,6 @@ Airlytix is a environment monitoring solution based on the ESPHome platform. It 
 
 This repository contains the configuration files needed to set up and run Airlytix on various hardware platforms. These files are specifically designed for use with Airlytix hardware, ensuring optimal performance and reliability.
 
-![Airlytix Device Image Placeholder](image_placeholder.png)
-
-
 ## Official Documentation
 
 For comprehensive instructions on how to set up and use your Airlytix hardware, please refer to the [official Airlytix documentation](https://docs.airlytix.io).
@@ -18,7 +15,7 @@ If you're interested in local development, you can use the configuration files i
 1. **Clone the Repository**: Use the `git clone` command to clone this repository to your local machine.
 
 ```bash
-git clone https://github.com/username/airlytix.git
+git clone https://github.com/airlytix/configuration.git
 ```
 
 2. **Install ESPHome**: If you haven't already, install ESPHome on your machine. Detailed instructions on how to do this can be found on the [ESPHome website](https://esphome.io/guides/getting_started_command_line.html)..
