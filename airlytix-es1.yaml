@@ -2,7 +2,7 @@ substitutions:
   name: "airlytix-es1"
   friendly_name: "Airlytix"
   project_name: "airlytix.es1"
-  project_version: "1.0.1"
+  project_version: "1.1.0"
   indicator_max_power: "1"
   sht4x_temperature_offset: "-11"
   sht4x_humidity_offset: "30"
@@ -37,6 +37,13 @@ esp32:
   framework:
     type: esp-idf
     version: recommended
+    sdkconfig_options:
+      CONFIG_ESP32_DEFAULT_CPU_FREQ_240: y
+      CONFIG_COMPILER_OPTIMIZATION_SIZE: n
+      CONFIG_COMPILER_OPTIMIZATION_PERF: y
+    components:
+      - name: esp-dsp
+        source: github://espressif/esp-dsp
 
 logger:
 
@@ -50,7 +57,6 @@ dashboard_import:
   import_full_config: false
 
 external_components:
-  - source: github://airlytix/esphome-sound-level-meter@main
   - source: github://airlytix/configuration@main
 
 wifi:
@@ -407,18 +413,16 @@ sensor:
     unit_of_measurement: "%"
     entity_category: "diagnostic"
 
-
 sound_level_meter:
+  i2s_din_pin: GPIO14
+  sample_rate: 48000
+  bits_per_sample: 24bit
+  use_apll: true
   update_interval: 60s
-  is_on: true
-  buffer_size: 1024
   warmup_interval: 500ms
-  task_stack_size: 4096
-  task_priority: 2
-  task_core: 1
   mic_sensitivity: -26dB
   mic_sensitivity_ref: 94dB
-  offset: 0dB
+  offset: -47dB
   groups:
     - filters:
         - type: sos
@@ -1153,13 +1157,6 @@ i2c:
   scan: true
   id: i2c_bus_a
 
-i2s:
- bck_pin: GPIO4
- ws_pin: GPIO27
- din_pin: GPIO14
- sample_rate: 48000
- bits_per_sample: 32
- dma_buf_count: 8
- dma_buf_len: 256
- use_apll: true
- bits_shift: 8
+i2s_audio:
+  i2s_lrclk_pin: GPIO27
+  i2s_bclk_pin: GPIO4
