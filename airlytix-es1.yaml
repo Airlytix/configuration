@@ -53,11 +53,11 @@ ota:
   platform: esphome
 
 dashboard_import:
-  package_import_url: github://airlytix/configuration/airlytix-es1.yaml@beta
+  package_import_url: github://airlytix/configuration/airlytix-es1.yaml@main
   import_full_config: false
 
 external_components:
-  - source: github://airlytix/configuration@beta
+  - source: github://airlytix/configuration@main
 
 wifi:
   ap:
