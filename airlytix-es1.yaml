@@ -631,7 +631,7 @@ number:
     name: CO2 Good Min
     icon: mdi:arrow-left-right
     entity_category: config
-    min_value: 400
+    min_value: 0
     max_value: 5000
     initial_value: 400
     optimistic: true
@@ -646,7 +646,7 @@ number:
     name: CO2 Good Max
     icon: mdi:arrow-left-right
     entity_category: config
-    min_value: 400
+    min_value: 0
     max_value: 5000
     initial_value: 1000
     optimistic: true
@@ -661,7 +661,7 @@ number:
     name: CO2 Fair Min
     icon: mdi:arrow-left-right
     entity_category: config
-    min_value: 400
+    min_value: 0
     max_value: 1000
     initial_value: 1000
     optimistic: true
@@ -676,7 +676,7 @@ number:
     name: CO2 Fair Max
     icon: mdi:arrow-left-right
     entity_category: config
-    min_value: 400
+    min_value: 0
     max_value: 5000
     initial_value: 1500
     optimistic: true
