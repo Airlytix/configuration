@@ -633,7 +633,7 @@ number:
     entity_category: config
     min_value: 0
     max_value: 5000
-    initial_value: 400
+    initial_value: 0
     optimistic: true
     step: 1
     restore_value: true
