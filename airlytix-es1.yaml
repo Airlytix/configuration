@@ -2,7 +2,7 @@ substitutions:
   name: "airlytix-es1"
   friendly_name: "Airlytix"
   project_name: "airlytix.es1"
-  project_version: "1.1.0"
+  project_version: "1.1.1"
   indicator_max_power: "1"
   sht4x_temperature_offset: "-11"
   sht4x_humidity_offset: "30"
@@ -98,7 +98,7 @@ light:
     name: "Indicator Light"
     output: dummy_output
     default_transition_length: 0s
-    restore_mode: RESTORE_AND_ON
+    restore_mode: RESTORE_DEFAULT_ON
     on_turn_on: 
       then:
         - light.turn_on: 
