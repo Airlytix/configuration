@@ -95,8 +95,6 @@ void SoundLevelMeter::setup()
         .bits_per_chan = this->bits_per_channel_,
     };
 
-    esp_err_t err;
-
     {
     if (this->pdm_)
         config.mode = (i2s_mode_t) (config.mode | I2S_MODE_PDM);
