@@ -9,6 +9,12 @@
 #include "esphome/components/i2s_audio/i2s_audio.h"
 #include <freertos/queue.h>
 
+#ifndef USE_I2S_LEGACY
+#ifndef I2S_GPIO_UNUSED
+#define USE_I2S_LEGACY
+#endif
+#endif
+
 namespace esphome {
 namespace sound_level_meter {
 class SensorGroup;
