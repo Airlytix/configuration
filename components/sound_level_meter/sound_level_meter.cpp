@@ -31,7 +31,15 @@ uint32_t SoundLevelMeter::get_sample_rate() { return this->sample_rate_; }
 void SoundLevelMeter::dump_config() {
     ESP_LOGCONFIG(TAG, "Sound Level Meter:");
     ESP_LOGCONFIG(TAG, "  Sample Rate %u", this->get_sample_rate());
+#ifdef USE_I2S_LEGACY
     ESP_LOGCONFIG(TAG, "  Bits Per Sample %u", this->bits_per_sample_);
+#else
+    uint8_t bits_per_sample = 16;
+    if (this->slot_bit_width_ != I2S_SLOT_BIT_WIDTH_AUTO) {
+    bits_per_sample = this->slot_bit_width_;
+    }
+    ESP_LOGCONFIG(TAG, "  Bits Per Sample %u", bits_per_sample);
+#endif
     if (this->get_mic_sensitivity().has_value())
         ESP_LOGCONFIG(TAG, "  Mic Sensitivity %fdB", *this->get_mic_sensitivity());
     if (this->get_mic_sensitivity_ref().has_value())
@@ -68,6 +76,9 @@ void SoundLevelMeter::setup()
         this->mark_failed();
         return;
     }
+    esp_err_t err;
+
+#ifdef USE_I2S_LEGACY
     i2s_driver_config_t config = {
         .mode = (i2s_mode_t) (this->i2s_mode_ | I2S_MODE_RX),
         .sample_rate = this->sample_rate_,
@@ -107,6 +118,65 @@ void SoundLevelMeter::setup()
         return;
     }
     }
+#else
+    i2s_chan_config_t chan_cfg = {
+        .id = this->parent_->get_port(),
+        .role = this->i2s_role_,
+        .dma_desc_num = 4,
+        .dma_frame_num = 256,
+        .auto_clear = false,
+    };
+    /* Allocate a new RX channel and get the handle of this channel */
+    err = i2s_new_channel(&chan_cfg, NULL, &this->rx_handle_);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Error creating new I2S channel: %s", esp_err_to_name(err));
+        this->status_set_error();
+        return;
+    }
+
+    i2s_clock_src_t clk_src = I2S_CLK_SRC_DEFAULT;
+#ifdef I2S_CLK_SRC_APLL
+    if (this->use_apll_) {
+        clk_src = I2S_CLK_SRC_APLL;
+    }
+#endif
+    i2s_std_gpio_config_t pin_config = this->parent_->get_pin_config();
+
+    {
+        i2s_std_clk_config_t clk_cfg = {
+            .sample_rate_hz = this->sample_rate_,
+            .clk_src = clk_src,
+            .mclk_multiple = I2S_MCLK_MULTIPLE_384,
+        };
+        i2s_std_slot_config_t std_slot_cfg =
+            I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG((i2s_data_bit_width_t) this->slot_bit_width_, this->slot_mode_);
+        std_slot_cfg.slot_bit_width = this->slot_bit_width_;
+        std_slot_cfg.slot_mask = this->std_slot_mask_;
+    
+        pin_config.din = this->din_pin_;
+    
+        i2s_std_config_t std_cfg = {
+            .clk_cfg = clk_cfg,
+            .slot_cfg = std_slot_cfg,
+            .gpio_cfg = pin_config,
+        };
+        /* Initialize the channel */
+        err = i2s_channel_init_std_mode(this->rx_handle_, &std_cfg);
+    }
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Error initializing I2S channel: %s", esp_err_to_name(err));
+        this->status_set_error();
+        return;
+    }
+
+    /* Before reading data, start the RX channel first */
+    i2s_channel_enable(this->rx_handle_);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Error enabling I2S Microphone: %s", esp_err_to_name(err));
+        this->status_set_error();
+        return;
+    }
+#endif
 
     this->publish_queue_ = xQueueCreate(8, sizeof(PublishState));
     if (this->publish_queue_ == nullptr) {
@@ -122,6 +192,11 @@ void SoundLevelMeter::setup()
 
 void SoundLevelMeter::loop()
 {
+    if (this->publish_queue_ == nullptr) {
+        ESP_LOGE(TAG, "Publish queue is not initialized!");
+        return;
+    }
+
     PublishState ps;
     if (xQueueReceive(this->publish_queue_, &ps, 0) == pdTRUE) {
         if (ps.sensor != nullptr) {
@@ -166,24 +241,38 @@ size_t SoundLevelMeter::read_(int32_t *buf, size_t frames_requested, std::vector
     // Convert that to bytes for i2s_read:
     const size_t bytes_to_read = frames_requested * sizeof(int32_t);
     size_t bytes_read = 0;
+    TickType_t ticks_to_wait = 100 / portTICK_PERIOD_MS;
 
     // Perform an I2S read with up to a 100ms timeout
+#ifdef USE_I2S_LEGACY
     esp_err_t err = i2s_read(
         this->parent_->get_port(),  // which I2S port
         buf,                        // destination buffer (int32_t*)
         bytes_to_read,             // how many bytes we want
         &bytes_read,               // how many bytes we actually got
-        (100 / portTICK_PERIOD_MS)
+        ticks_to_wait
     );
+#else
+    // i2s_channel_read expects the timeout value in ms, not ticks
+    esp_err_t err = i2s_channel_read(
+        this->rx_handle_, 
+        buf, 
+        bytes_to_read, 
+        &bytes_read, 
+        100);
+#endif
 
     // Handle errors or zero data
-    if (err != ESP_OK) {
-        ESP_LOGW(TAG, "Error reading from I2S microphone: %s", esp_err_to_name(err));
+    if ((err != ESP_OK) && ((err != ESP_ERR_TIMEOUT) || (ticks_to_wait != 0))) {
+        // Ignore ESP_ERR_TIMEOUT if ticks_to_wait = 0, as it will read the data on the next call
+        if (!this->status_has_warning()) {
+            // Avoid spamming the logs with the error message if its repeated
+            ESP_LOGW(TAG, "Error reading from I2S microphone: %s", esp_err_to_name(err));
+        }
         this->status_set_warning();
         return 0;
     }
-    if (bytes_read == 0) {
-        // Timed out or no data arrived
+    if ((bytes_read == 0) && (ticks_to_wait > 0)) {
         this->status_set_warning();
         return 0;
     }

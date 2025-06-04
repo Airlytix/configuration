@@ -22,7 +22,11 @@ class SoundLevelMeter : public i2s_audio::I2SAudioIn, public Component {
     void dump_config() override;
     void loop() override;
   
+#ifdef USE_I2S_LEGACY
     void set_din_pin(int8_t pin) { this->din_pin_ = pin; }
+#else
+    void set_din_pin(int8_t pin) { this->din_pin_ = (gpio_num_t) pin; }
+#endif
     void set_pdm(bool pdm) { this->pdm_ = pdm; }
     void set_update_interval(uint32_t update_interval) {this->update_interval_ = update_interval;}
     uint32_t get_update_interval() { return this->update_interval_; }
@@ -40,7 +44,12 @@ class SoundLevelMeter : public i2s_audio::I2SAudioIn, public Component {
   protected:
     size_t read_(int32_t *buf, size_t frames_requested, std::vector<float> &buffer);
   
+#ifdef USE_I2S_LEGACY
     int8_t din_pin_{I2S_PIN_NO_CHANGE};
+#else
+    gpio_num_t din_pin_{I2S_GPIO_UNUSED};
+    i2s_chan_handle_t rx_handle_;
+#endif
     bool pdm_{false};
 
     std::vector<SensorGroup *> groups_;
