@@ -1,0 +1,40 @@
+name: Nightly validate build with latest esphome
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "firmware-build-${{ github.ref }}"
+  cancel-in-progress: false
+
+jobs:
+  list-configs:
+    runs-on: ubuntu-latest
+    outputs:
+      names: ${{ steps.set-matrix.outputs.names }}
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - id: set-matrix
+        run: |
+          echo "names=$(ls *.yaml | xargs -I{} basename {} | sed 's/\.[^.]*$//' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+
+  build:
+    name: Build ESPHome binary for ${{ matrix.config_file }}
+    needs: [list-configs]
+    strategy:
+        matrix:
+            config_file: ${{ fromJson(needs.list-configs.outputs.names) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: esphome build
+        id: esphome-build
+        uses: esphome/build-action@v7.0.0
+        with:
+          yaml-file:  ${{ matrix.config_file }}.yaml
+          version: "latest"
