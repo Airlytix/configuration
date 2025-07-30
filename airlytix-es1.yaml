@@ -18,32 +18,32 @@ esphome:
   project:
     name: ${project_name}
     version: ${project_version}
-  on_boot: 
-    then:
-      - if: 
-          condition:
-            - light.is_on: indicator_light
-          then:
-            - light.turn_on:
-                id: indicator_light_internal
-                brightness: !lambda return id(indicator_light).remote_values.get_brightness();
-                blue: 1
-                red: 0
-                green: 0
-                effect: Pulse
+  on_boot:
+    - priority: 800
+      then:
+        - if: 
+            condition:
+              - light.is_on: indicator_light
+            then:
+              - light.turn_on:
+                  id: indicator_light_internal
+                  brightness: !lambda return id(indicator_light).remote_values.get_brightness();
+                  blue: 1
+                  red: 0
+                  green: 0
+                  effect: Pulse
+    - priority: -100
+      then:
+        - sound_level.start: ambient_sound_level
 
 esp32:
   board: esp32dev
   framework:
     type: esp-idf
-    version: recommended
     sdkconfig_options:
       CONFIG_ESP32_DEFAULT_CPU_FREQ_240: y
-      CONFIG_COMPILER_OPTIMIZATION_SIZE: n
+      CONFIG_COMPILER_OPTIMIZATION_SIZE: y
       CONFIG_COMPILER_OPTIMIZATION_PERF: y
-    components:
-      - name: esp-dsp
-        source: github://espressif/esp-dsp
 
 logger:
 
@@ -413,41 +413,28 @@ sensor:
     unit_of_measurement: "%"
     entity_category: "diagnostic"
 
-sound_level_meter:
-  i2s_din_pin: GPIO14
-  sample_rate: 48000
-  bits_per_sample: 24bit
-  use_apll: true
-  update_interval: 60s
-  warmup_interval: 500ms
-  mic_sensitivity: -26dB
-  mic_sensitivity_ref: 94dB
-  offset: -47dB
-  groups:
-    - filters:
-        - type: sos
-          coeffs:
-            # ICS-43434:
-            - [ 0.47732642,  0.46294358, 0.11224797, 0.06681948, 0.00111522]
-            - [ 1.,         -1.9890593,  0.98908925, -1.9975533, 0.99755484]
+  - platform: sound_level
+    id: ambient_sound_level
+    microphone: sound_level_mic
+    measurement_duration: 60s
+    passive: false
+    peak:
+      name: Ambient Sound Level (LApeak_1min)
+      id: soundlevel_lapeak_1min
+    rms:
+      name: Ambient Sound Level (LAeq_1min)
+      id: soundlevel_laeq_1min
 
-      groups:
-        - filters:
-            - type: sos
-              coeffs:
-                # A-weighting:
-                - [ 0.16999495 ,  0.741029   ,  0.52548885 , -0.11321865 , -0.056549273]
-                - [ 1.         , -2.00027    ,  1.0002706  , -0.03433284 , -0.79215795 ]
-                - [ 1.         , -0.709303   , -0.29071867 , -1.9822421  ,  0.9822986  ]
-          sensors:
-            - type: eq
-              name: Ambient Sound Level (LAeq_1min)
-              id: soundlevel_laeq_1min
-              unit_of_measurement: dBA
-            - type: peak
-              name: Ambient Sound Level (LApeak_1min)
-              id: soundlevel_lapeak_1min
-              unit_of_measurement: dBA
+microphone:
+  - platform: i2s_audio
+    id: sound_level_mic
+    adc_type: external
+    i2s_din_pin: GPIO14
+    channel: right
+    sample_rate: 48000
+    bits_per_sample: 24bit
+    use_apll: true
+    mclk_multiple: 384
 
 number:
   - platform: template
