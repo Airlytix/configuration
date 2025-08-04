@@ -19,7 +19,7 @@ esphome:
     name: ${project_name}
     version: ${project_version}
   on_boot:
-    - priority: 800
+    - priority: 100
       then:
         - if: 
             condition:
