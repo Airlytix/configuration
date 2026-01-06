@@ -40,7 +40,7 @@ namespace esphome
       i2c::ErrorCode read_data_register_(uint8_t a_register, uint16_t &data)
       {
         uint8_t buffer[2];
-        auto retval = this->read_register(a_register, buffer, 2, false);
+        auto retval = this->read_register(a_register, buffer, 2);
         if (retval == i2c::ERROR_OK) {
           data = (uint16_t(buffer[1]) << 8) | (uint16_t(buffer[0]) & 0xFF);
         }
