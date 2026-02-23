@@ -166,6 +166,8 @@ sensor:
     type: kalman
     name: "Temperature"
     unit_of_measurement: °C
+    device_class: temperature
+    state_class: measurement
     process_std_dev: 0.001
     sources:
       - source: sht4x_temperature
@@ -190,6 +192,8 @@ sensor:
     type: kalman
     name: "Humidity"
     unit_of_measurement: "%"
+    device_class: humidity
+    state_class: measurement
     process_std_dev: 0.001
     sources:
       - source: sht4x_humidity
