@@ -34,7 +34,7 @@ jobs:
 
       - name: esphome build
         id: esphome-build
-        uses: esphome/build-action@v7.0.0
+        uses: esphome/build-action@v7.3.0
         with:
           yaml-file:  ${{ matrix.config_file }}.yaml
           version: "latest"

@@ -37,10 +37,10 @@ jobs:
 
       - name: esphome build
         id: esphome-build
-        uses: esphome/build-action@v7.0.0
+        uses: esphome/build-action@v7.3.0
         with:
           yaml-file:  ${{ matrix.config_file }}.yaml
-          version: "2025.5.0"
+          version: "2026.5.3"
 
       - run: |
           mkdir output
